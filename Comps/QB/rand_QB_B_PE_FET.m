@@ -1,6 +1,6 @@
-function [Q, B] = rand_QB_B_PE_FR(A, k, s, p, block_size) 
-    norm_A = norm(A, 'fro');
+function [Q, B] = rand_QB_B_PE_FET(A, block_size, tol, k, p)
     
+    norm_A = norm(A, 'fro');
     if norm_A == 0
         fprintf('The input matrix is empty.');
         return
@@ -8,12 +8,9 @@ function [Q, B] = rand_QB_B_PE_FR(A, k, s, p, block_size)
 
     class_A = class(A);
     [m, n] = size(A);
-    
-    l = k + s;
-    approximation_error = 0;
     norm_B = 0;
     
-    Omega = randn(n, l, class_A);
+    Omega = randn(n, k, class_A);
     
     Q = zeros(m, 0, class_A);
     B = zeros(0, n, class_A);
@@ -27,13 +24,13 @@ function [Q, B] = rand_QB_B_PE_FR(A, k, s, p, block_size)
     H = A' * G;
     
     curr_idx = 1;
-    while curr_idx < l
-        
+    while curr_idx < k
+    
         %Avoiding exceeding array bounds 
-        if(block_size + curr_idx - 1 > l)
+        if(block_size + curr_idx - 1 > k)
             block_size = l - curr_idx + 1;
         end
-        
+    
         Omega_i = Omega(:, curr_idx : curr_idx + block_size - 1);
         
         Temp = B * Omega_i;
@@ -45,24 +42,27 @@ function [Q, B] = rand_QB_B_PE_FR(A, k, s, p, block_size)
         R_i = R_i * R_;
 
         B_i = transpose(R_i) \ ((H(:, curr_idx : curr_idx + block_size - 1))' - (Y_i' * Q) * B - (Temp' * B));
-
-        Q = [Q, Q_i]; %#ok<AGROW>
-        B = [B; B_i]; %#ok<AGROW>
         
-        %In this case, keeping track of an approximation error is only used
-        %for controlling the rouns-off error accumulation
         norm_B = hypot(norm_B, norm(B_i, 'fro'));
         prev_error = approximation_error;
-        approximation_error = sqrt(abs(norm_A - norm_B) * (norm_A+norm_B)) / norm_A;
+        approximation_error = sqrt(abs(norm_A - norm_B) * (norm_A + norm_B)) / norm_A;
         
         %Handling the round-off error accumulation
         if (curr_idx > 1) && (approximation_error > prev_error)
-            Q(:, end - block_size + 1 : end) = [];
-            B(end - block_size + 1 : end, :) = [];
             break
         end
         
-        curr_idx = curr_idx + block_size;
+        Q = [Q, Q_i]; %#ok<AGROW>
+        B = [B; B_i]; %#ok<AGROW>
         
+        if approximation_error < tol       
+            break;
+        end
+        
+        curr_idx = curr_idx + block_size;
+    end
+    
+    if curr_idx == k
+        fprintf('Approximation error = %f. Fail to converge within the specified tolerance.\n\n', approximation_error / norm_A);
     end
 end
