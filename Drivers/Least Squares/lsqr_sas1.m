@@ -1,22 +1,27 @@
+function [x_ske] = lsqr_sas1(A, b, sampling_factor) 
 %{
 A sketch-and-solve approach to overdetermined ordinary least squares.
+Uses Matlab's built-in lsrn function. 
 ----------
 The sketch-and-solve approach is attributed to a 2006 paper by Sarlos:
 "Improved approximation algorithms for large matrices via random
 projections." An introduction and summary of this approach can be found
 in [MT:2020, Sections 10.2 -- 10.3].
 %}
-function [x] = lsqr_sas1(A, b) 
-
-    [num_rows, num_colms] = size(A);
-    d = dim_checks(sampling_factor, n_ro)
-    
+    [num_rows, num_cols] = size(A);
+    d = dim_checks(sampling_factor, num_rows, num_cols);
+    % By default, a Gaussian random sketching m,atrix is used.
+    % Alternative choices are present in '../../Utils/Sketching_Operators'.
+    Omega = randn(d, num_rows);
+    A_ske = Omega * A;
+    b_ske = Omega * b;
+    x_ske = lsqr(A_ske, b_ske);
 end
 
-
+% Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
-    d = cast(sampling_factor * num_cols, int16);
+    d = cast((sampling_factor * num_cols), 'uint16');
     if d > num_rows
         fprintf(['The embedding dimension "d" should not be larger than the', ... 
         'number of rows of the data matrix. Here, an embedding dimension', ...

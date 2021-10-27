@@ -1,6 +1,45 @@
 function [res, log] = lsqr_sap1(A, b, sampling_factor, tol, iter_lim, logging)
-    
-    if logging == 0
+    %{
+    A sketch-and-precondition approach to overdetermined ordinary least
+    squares. This implementation uses QR to obtain the preconditioner and
+    it uses LSQR for the iterative method.
+
+    Before starting LSQR, we run a basic sketch-and-solve (for free, given
+    our QR decomposition of the sketched data matrix) to obtain a solution
+    x_ske. If ||A * x_ske - b||_2 < ||b||_2, then we initialize LSQR at x_ske.
+    This implementation assumes A is full rank.
+    References
+    ----------
+    This implementation was inspired by Blendenpik (AMT:2010). The differences
+    relative to the official Blendenpik algorithm [AMT:2010, Algorithm 1] are
+
+        (1) We make no assumption on the distribution of the sketching matrix
+            which may be to form the preconditioner. Blendenpik only used
+            SRTTs (Walsh-Hadamard, discrete cosine, discrete Hartley).
+            However, this specific implementation uses random Gaussian
+            sketching matrix. 
+
+        (2) We let the user specify the exact embedding dimension, as
+            floor(self.oversampling_factor * A.shape[1]).
+
+        (3) We do not zero-pad A with additional rows. Such zero padding
+            might be desirable to facilitate rapid application of SRTT
+            sketching operators. It is possible to implement an SRTT operator
+            so that it performs zero-padding internally.
+
+        (4) We do not perform any checks on the quality of the preconditioner.
+
+        (5) We initialize the iterative solver (LSQR) at the better of the two
+            solutions given by either the zero vector or the output of
+            sketch-and-solve.
+
+    Note:
+    This implementation has the option of logging detailed information
+    on runtime and the rate at which (preconditioned) normal equation
+    error decays while LSQR runs. Controlled by passing a boolean parameter
+    "logging".
+    %}
+    if ~logging
         disp('Optional parameter for logging detailed information has not been passed.'); 
     end
     
@@ -9,6 +48,8 @@ function [res, log] = lsqr_sap1(A, b, sampling_factor, tol, iter_lim, logging)
     
     % Sketch the data matrix.
     if logging, tic, end
+    % By default, a Gaussian random sketching m,atrix is used.
+    % Alternative choices are present in '../../Utils/Sketching_Operators'.
     Omega = randn(d, num_rows);
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
@@ -57,7 +98,7 @@ function [res, log] = lsqr_sap1(A, b, sampling_factor, tol, iter_lim, logging)
     end
 end
 
-
+% Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
     d = cast((sampling_factor * num_cols), 'uint16');

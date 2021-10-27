@@ -1,4 +1,22 @@
 function[Omega] = sjlt(num_rows, num_cols, nnz)
+%{
+    Generates a sketching operator utilizing Sparse Johnson-Lindenstrauss
+    transform.
+
+    Parameters
+    ----------
+    rng
+    num_rows : int
+        number of rows of embedding operator
+    num_cols : int
+        number of columns of embedding operator
+    nnz : int
+        number of nonzeros in each column (if num_cols > num_rows) or each 
+        row (if num_rows >= num_cols)
+    Returns
+    -------
+    S : Matlab sparse matrix
+%}
     % Default choice for number of nonzero entries in each column. 
     % nnz = 8;
     
