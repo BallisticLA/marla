@@ -21,10 +21,10 @@ function[Omega] = srht(A, d)
     
     % Random subsampling of the transform output
     idx = sort(randsample(m, d));
-    Omega = Omega(idx, :);
+    Omega = Omega(idx, :)';
     % Multiplying by a constanat
     Omega = Omega * (sqrt(m / d));
-    % Optional random column permutation
+    % Optional random row permutation
     idx = randperm(n);
-    Omega = Omega(:,idx)';
+    Omega = Omega(idx,:);
 end

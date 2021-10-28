@@ -43,9 +43,9 @@ implementation requires >= 2 steps.
 %}
     
     % Sketch construction stage - alternative options are available in 
-    %'../Sketch_Construction'.
-    addpath('../Sketch_Construction');
-    Q = sketch_construction(A, k, p);
+    %'../Rangefinders'.
+    addpath('../Rangefinders');
+    Q = rangefinder(A, k, p);
     % Stage of computing B deterministically. 
     B = Q' * A;
 end

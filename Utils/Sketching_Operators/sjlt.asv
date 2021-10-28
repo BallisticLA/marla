@@ -19,11 +19,9 @@ function[Omega] = sjlt(num_rows, num_cols, nnz)
 %}
     % Default choice for number of nonzero entries in each column. 
     % nnz = 8;
-    
-    % Ensuring type compatabilities. 
-    num_cols = cast(num_cols, 'uint8');
-    num_rows = cast(num_rows, 'uint8');
-    nnz = cast(nnz, 'uint8');
+        num_cols = cast(num_cols, 'uint8');
+        num_rows = cast(num_rows, 'uint8');
+        nnz = cast(nnz, 'uint8');
     
     if num_rows > num_cols
         rows = uint8.empty;

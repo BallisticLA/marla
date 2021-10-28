@@ -1,4 +1,4 @@
-function [Q] = alter_sketch_construction(A, k, p)
+function [Q] = rangefinder_alter(A, k, p)
     %{
     Routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 

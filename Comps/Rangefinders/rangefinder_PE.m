@@ -1,4 +1,4 @@
-function [Q] = skecth_construction_PE(A, k, p)
+function [Q] = rangefinder_PE(A, k, p)
     %{
     Pass-Efficient routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 

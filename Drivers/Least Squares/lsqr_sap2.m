@@ -35,9 +35,10 @@ function [x_star, log] = lsqr_sap2(A, b, sampling_factor, tol, iter_lim, smart_i
     
     % Sketch the data matrix.
     if logging, tic, end
-    % By default, a Gaussian random sketching m,atrix is used.
+    % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
-    Omega = randn(d, num_rows);
+    addpath('../../Utils/Sketching_Operators')
+    Omega = sjlt(d, num_rows, 8);
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
     
@@ -110,7 +111,7 @@ end
 % Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
-    d = cast((sampling_factor * num_cols), 'uint16');
+    d = cast((sampling_factor * num_cols), 'uint8');
     if d > num_rows
         fprintf(['The embedding dimension "d" should not be larger than the', ... 
         'number of rows of the data matrix. Here, an embedding dimension', ...

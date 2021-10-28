@@ -52,13 +52,15 @@ for some QB implementations.
     % ISSUE TO REPORT: For some reason, [U,S,V] = svd(A,"vector") does not
     % work.    
     S = diag(S);
+    % Removing singular values below machine precision. 
+    cutoff = find(S < eps(class(S)), 1);
     % Removing "oversampled" data. 
     if s > 0
-        cutoff = min(k, size(S));
-        U = U(:, 1:cutoff);
-        S = S(1:cutoff);
-        V = V(1:cutoff, :);
+        cutoff = min(k, cutoff);
     end
+    U = U(:, 1:cutoff);
+    S = S(1:cutoff);
+    V = V(1:cutoff, :);
     % Adjusting matrix U. 
     U = Q * U;
 end
