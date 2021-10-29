@@ -48,10 +48,7 @@ for some QB implementations.
     addpath('../Comps/QB');
     [Q, B] = rand_QB(A, k + s, p);
     % Using a built-in function for computing an SVD. 
-    [U, S, V] = svd(B);
-    % ISSUE TO REPORT: For some reason, [U,S,V] = svd(A,"vector") does not
-    % work.    
-    S = diag(S);
+    [U, S, V] = svd(B, 'vector');
     % Removing singular values below machine precision. 
     cutoff = find(S < eps(class(S)), 1);
     % Removing "oversampled" data. 

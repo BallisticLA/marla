@@ -1,35 +1,48 @@
-function [x_star, log] = lsqr_sap2(A, b, sampling_factor, tol, iter_lim, smart_init, logging) 
+function [res, log] = spo1(A, b, sampling_factor, tol, iter_lim, logging)
     %{
     A sketch-and-precondition approach to overdetermined ordinary least
-    squares. This implementation uses the SVD to obtain the preconditioner
-    and it uses LSQR for the iterative method.
+    squares. This implementation uses QR to obtain the preconditioner and
+    it uses LSQR for the iterative method.
 
     Before starting LSQR, we run a basic sketch-and-solve (for free, given
-    our SVD of the sketched data matrix) to obtain a solution x_ske.
-    If ||A x_ske - b||_2 < ||b||_2, then we initialize LSQR at x_ske.
-    This implementation does not require that A is full-rank.
+    our QR decomposition of the sketched data matrix) to obtain a solution
+    x_ske. If ||A * x_ske - b||_2 < ||b||_2, then we initialize LSQR at x_ske.
+    This implementation assumes A is full rank.
     References
     ----------
-    This implementation was inspired by LSRN. The differences relative to the
-    official LSRN algorithm [MSM:2014, Algorithm 1] are
-        (1) We make no assumption on the potential distribution of the sketching operator.
+    This implementation was inspired by Blendenpik (AMT:2010). The differences
+    relative to the official Blendenpik algorithm [AMT:2010, Algorithm 1] are
+
+        (1) We make no assumption on the distribution of the sketching matrix
+            which may be to form the preconditioner. Blendenpik only used
+            SRTTs (Walsh-Hadamard, discrete cosine, discrete Hartley).
             However, this specific implementation uses random Gaussian
             sketching matrix. 
 
-        (2) We provide the option of intelligently initializing the iterative
-            solver (LSQR) with the better of the two solutions given by the
-            zero vector and the result of sketch-and-solve.
-    
+        (2) We let the user specify the exact embedding dimension, as
+            floor(self.oversampling_factor * A.shape[1]).
+
+        (3) We do not zero-pad A with additional rows. Such zero padding
+            might be desirable to facilitate rapid application of SRTT
+            sketching operators. It is possible to implement an SRTT operator
+            so that it performs zero-padding internally.
+
+        (4) We do not perform any checks on the quality of the preconditioner.
+
+        (5) We initialize the iterative solver (LSQR) at the better of the two
+            solutions given by either the zero vector or the output of
+            sketch-and-solve.
+
     Note:
     This implementation has the option of logging detailed information
     on runtime and the rate at which (preconditioned) normal equation
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
     %}
-    if logging == 0
+    if ~logging
         disp('Optional parameter for logging detailed information has not been passed.'); 
     end
-
+    
     [num_rows, num_cols] = size(A);
     d = dim_checks(sampling_factor, num_rows, num_cols);
     
@@ -42,49 +55,27 @@ function [x_star, log] = lsqr_sap2(A, b, sampling_factor, tol, iter_lim, smart_i
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
     
-    % Factor the sketch. 
-    %  We also measure the time to scale the right singular vectors
-    %   as needed for the preconditioner. SAP1 doesn't have a
-    %   directly comparable cost.
-    if logging, tic, end
-    [U, S, V] = svd(A_ske, 'econ');
-    % ISSUE TO REPORT: For some reason, [U,S,V] = svd(A,"vector") does not
-    % work.
-    S = diag(S);
-    rank = nnz(S > S(1) * num_cols * eps('double'));
-    N = bsxfun(@rdivide, V(1:rank, :)', S(1:rank));
+    % Factor the sketch.
+    if logging, tic, end 
+    [Q, R] = qr(A_ske, 0);
     if logging, log.t_factor = toc; end
     
-    if smart_init
-        % Sketch-and-solve type preprocessing.
-        %   This isn't necessarily preferable, because it changes the
-        %   norm of b, which affects termination criteria.  
-        if logging, tic, end
-        b_ske = Omega * b;
-        x_ske = N * (U(:, 1:rank)' * b_ske);
-        b_remainder = b - A * x_ske;
-        success = norm(b_remainder, 2) < norm(b, 2);
-        if logging, log.t_presolve = toc; end
-        
-        % Iterative phase.
-        if success
-           % x_ske is a better starting point than the zero vector. 
-           if logging, tic, end
-           [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b_remainder, tol, iter_lim, N);
-           x_star = x_star + ske;
-           if logging, log.t_iterate = toc; end 
-        else
-           % The zero vector is at least as good as x_ske. 
-           if logging, tic, end
-           [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, N);
-           if logging, log.t_iterate = toc; end 
-        end
-    else
-        % Iterative phase.
-        if logging, tic, end
-        [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, N);
-        if logging, log.t_iterate = toc; end 
+    % Sketch-and-solve type preprocessing.
+    if logging, tic, end
+    b_ske = Omega * b;
+    x_ske = R \ (Q' * b_ske);
+    disp(x_ske);
+    x0 = int16.empty;
+    
+    if norm(A * x_ske - b, 'fro') < norm(b)
+        x0 = x_ske;
     end
+    if logging, log.t_presolve = toc; end
+    
+    % Iterative phase.
+    if logging, tic, end
+    [res, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, R, eye(size(R, 1)), x0);
+    if logging, log.t_iterate = toc; end    
     
     if logging
         % Record a vector of cumulative times to (1) sketch and factor, and
@@ -101,9 +92,10 @@ function [x_star, log] = lsqr_sap2(A, b, sampling_factor, tol, iter_lim, smart_i
         % Record a vector of (preconditioned) normal equation errors. Treat
         % the zero vector as a theoretically valid initialization point which
         % we would use before the "solve" phase of "sketch-and-solve".
-        ar0 = N' * (A' * b);
+        ar0 = A' * b;
+        ar0 = R \ ar0;
         ar0norm = norm(ar0, 'fro');
-        log.x = x_star;
+        log.x = res;
         log.arnorms = [ar0norm; resvec];
     end
 end

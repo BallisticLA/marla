@@ -1,4 +1,4 @@
-function [x_ske] = lsqr_sas1(A, b, sampling_factor) 
+function [x_ske] = sso1(A, b, sampling_factor) 
 %{
 A sketch-and-solve approach to overdetermined ordinary least squares.
 Uses direct method to solve the overdetermined problem.
