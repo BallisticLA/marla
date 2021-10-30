@@ -21,12 +21,12 @@ function[Omega] = sjlt(num_rows, num_cols, nnz)
     % nnz = 8;
     
     % Ensuring type compatabilities. 
-    num_cols = cast(num_cols, 'uint8');
-    num_rows = cast(num_rows, 'uint8');
-    nnz = cast(nnz, 'uint8');
+    num_cols = cast(num_cols, 'uint32');
+    num_rows = cast(num_rows, 'uint32');
+    nnz = cast(nnz, 'uint32');
     
-    if num_rows > num_cols
-        rows = uint8.empty;
+    if num_cols >= num_rows
+        rows = uint32.empty;
         nnz = min(num_cols, nnz);
         bad_size = num_rows < nnz;
         if bad_size
@@ -39,7 +39,6 @@ function[Omega] = sjlt(num_rows, num_cols, nnz)
             rows = cat(2, rows, row);
         end
         cols = repelem(1:num_cols, nnz);
-        
         % Values for each row and col.
         vals = ones(1, num_cols * nnz);
         vals(rand(1, num_cols * nnz) <= 0.5) = -1;

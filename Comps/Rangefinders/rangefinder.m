@@ -14,7 +14,7 @@ function [Q] = rangefinder(A, k, p)
     class_A = class(A);
     [~, n] = size(A);
     % By default, a Gaussian random sketching matrix is used.
-    % Alternative choices are present in '../Sketching_Operators'
+    % Alternative choices are present in '../../utils/sketching_operators'.
     Omega = randn(n, k, class_A);
     [Q, ~] = qr(A * Omega, 0);
 

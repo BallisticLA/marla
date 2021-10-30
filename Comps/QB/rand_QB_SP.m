@@ -1,4 +1,4 @@
-function [Q, B] = rand_QB_SP(A, k)
+function [Q, B] = rand_qb_sp(A, k)
 %{
 "Single-pass" version of QB algorithm.
 Return matrices (Q, B) from a rank-k QB factorization of A.

@@ -1,4 +1,4 @@
-function [Q, B] = rand_QB_B_PE(A, block_size, tol, k, p)
+function [Q, B] = rand_qb_b_pe(A, block_size, tol, k, p)
 %{
 Iteratively build an approximate QB factorization of A,
 which terminates once one of the following conditions
@@ -47,6 +47,8 @@ This implements a variant of [YGL:2018, Algorithm 4].
         fprintf('The input matrix is empty.');
         return
     end
+    % Setting initial error to zero.
+    approximation_error = 0;
     class_A = class(A);
     [m, n] = size(A);
     norm_B = 0;
@@ -66,9 +68,8 @@ This implements a variant of [YGL:2018, Algorithm 4].
     while curr_idx < k
         %Avoiding exceeding array bounds 
         if(block_size + curr_idx - 1 > k)
-            block_size = l - curr_idx + 1;
+            block_size = k - curr_idx + 1;
         end
-    
         Omega_i = Omega(:, curr_idx : curr_idx + block_size - 1);
         
         Temp = B * Omega_i;

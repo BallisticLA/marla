@@ -27,7 +27,7 @@ function [x_star, log] = spo2(A, b, sampling_factor, tol, iter_lim, smart_init, 
     "logging".
     %}
     if logging == 0
-        disp('Optional parameter for logging detailed information has not been passed.'); 
+        %disp('Optional parameter for logging detailed information has not been passed.'); 
     end
 
     [num_rows, num_cols] = size(A);
@@ -67,19 +67,21 @@ function [x_star, log] = spo2(A, b, sampling_factor, tol, iter_lim, smart_init, 
         if success
            % x_ske is a better starting point than the zero vector. 
            if logging, tic, end
-           [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b_remainder, tol, iter_lim, N);
+           [x_star, iters, resvec] = lsqr(A, b_remainder, tol, iter_lim, N, x_ske);
            x_star = x_star + ske;
            if logging, log.t_iterate = toc; end 
         else
            % The zero vector is at least as good as x_ske. 
            if logging, tic, end
-           [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, N);
+           x0 = double.empty;
+           [x_star, iters, resvec] = lsqr(A, b, tol, iter_lim, N, x0);
            if logging, log.t_iterate = toc; end 
         end
     else
         % Iterative phase.
         if logging, tic, end
-        [x_star, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, N);
+        x0 = double.empty;
+        [x_star, iters, resvec] = lsqr(A, b, tol, iter_lim, N, x0);
         if logging, log.t_iterate = toc; end 
     end
     
@@ -105,10 +107,34 @@ function [x_star, log] = spo2(A, b, sampling_factor, tol, iter_lim, smart_init, 
     end
 end
 
+function[x, iter] = cgls(A, b, tol, iter_lim, precond, x)
+    r = b - A * x;
+    p = N' * (A' * r);
+    s = p;
+    curr_tol = nrom(s, 2)^2;
+
+    while curr_to > tol
+        t = N * p;
+        q = A * t;
+        alpha = curr_tol / norm(q, 2)^2;
+        x = x + akpha * t;
+        r = r - alpha * q;
+        s = N' * (A' * r);
+        prev_tol = curr_tol;
+        curr_tol = norm(s, 2)^2;
+        beta = curr_tol / prev_tol;
+        p = s + beta * p;
+        iter = iter + 1;
+        if iter == iter_lim
+            break
+        end
+    end
+end
+
 % Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
-    d = cast((sampling_factor * num_cols), 'uint8');
+    d = cast((sampling_factor * num_cols), 'uint32');
     if d > num_rows
         fprintf(['The embedding dimension "d" should not be larger than the', ... 
         'number of rows of the data matrix. Here, an embedding dimension', ...

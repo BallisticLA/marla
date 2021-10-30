@@ -1,4 +1,4 @@
-function [Q] = rangefinder_PE(A, k, p)
+function [Q] = rangefinder_pe(A, k, p)
     %{
     Pass-Efficient routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 
@@ -31,7 +31,8 @@ function [Q] = rangefinder_PE(A, k, p)
     % Even number of passes over A.
     else
         % By default, a Gaussian random sketching matrix is used.
-        % Alternative choices are present in '../Sketching_Operators'
+        % Alternative choices are present in
+        % '../../utils/sketching_operators'.
         Q = randn(n, k, class_A);
         if p == 0
             [Q, ~] = qr(A * Q, 0);

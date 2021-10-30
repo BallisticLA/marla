@@ -1,4 +1,4 @@
-function [Q, B] = rand_QB(A, k, p)
+function [Q, B] = rand_qb(A, k, p)
 %{
 Return matrices (Q, B) from a rank-k QB factorization of A.
 ----------
@@ -37,15 +37,24 @@ The main difference between this implementation and Zhang and
 Mascagni's Algorithm 3.3: we use QR decompositions where they use LU
 decompositions. 
 Additionally, using an alternative sketching scheme from
-'../../Utils/Sketch_Construction' would allow 0 steps or 1 step of
+'../rangefinders' would allow 0 steps or 1 step of
 subspace iteration, where Zhang and Mascagni's Algorithm
 implementation requires >= 2 steps.
 %}
     
     % Sketch construction stage - alternative options are available in 
-    %'../Rangefinders'.
-    addpath('../Rangefinders');
-    Q = rangefinder(A, k, p);
+    %'../rangefinders'.
+    class_A = class(A);
+    [~, n] = size(A);
+    % By default, a Gaussian random sketching matrix is used.
+    % Alternative choices are present in '../Sketching_Operators'
+    Omega = randn(n, k, class_A);
+    [Q, ~] = qr(A * Omega, 0);
+
+    for j = 1 : p
+        [Q, ~] = qr(A' * Q, 0);
+        [Q, ~] = qr(A * Q, 0);
+    end
     % Stage of computing B deterministically. 
     B = Q' * A;
 end

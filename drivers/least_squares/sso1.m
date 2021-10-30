@@ -24,7 +24,7 @@ end
 % Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
-    d = cast((sampling_factor * num_cols), 'uint8');
+    d = cast((sampling_factor * num_cols), 'uint32');
     if d > num_rows
         fprintf(['The embedding dimension "d" should not be larger than the', ... 
         'number of rows of the data matrix. Here, an embedding dimension', ...

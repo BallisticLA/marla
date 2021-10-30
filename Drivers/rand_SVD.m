@@ -1,4 +1,4 @@
-function [U, S, V] = rand_SVD(A, k, s, p, tol, block_size)
+function [U, S, V] = rand_svd(A, k, s, p, tol, block_size)
 %{
 Return U, S, V where, for some integer ell <= k,
     U is size(A, 1)-by-ell,

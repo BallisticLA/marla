@@ -1,10 +1,8 @@
-function [C, U, R] = rand_CUR(A, k, s, p) 
+function [J_r, J_c, V_r, V_c] = rand_ds_id(A, k, s, p) 
     %{
-    Computes CUR Decomposition of matrix A.
-    Relies on row ID algorithm.
-
+    Computes double-sided Interpolative Decomposition of matrix A.
     Rank-k approximation of A is then present as:
-    A ~= C * U * R.
+    A ~= V_r * (A(J_r(1 : (k + s)), J_c(1 : (k + s)))) * V_c'.
 
     Parameters
     ----------
@@ -23,11 +21,8 @@ function [C, U, R] = rand_CUR(A, k, s, p)
     ----------
     Section 2.5 of https://arxiv.org/pdf/1502.05366.pdf - RSVDPACK notes.
     %}
-    [J_r, ~] = rand_row_ID(A, k, s, p);
-    R = A(J_r(1 : (k + s)), :);
-    
-    [J_c, V_c] = rand_row_ID(R', k, s, p);
-    C = A(:, J_c(:, 1 : (k + s)));
-    
-    U = V_c' / R;
+    % Row ID.
+    [J_r, V_r] = rand_row_ID(A, k, s, p);
+    % Column ID.
+    [J_c, V_c] = rand_row_ID(A(J_r(1 : (k + s)), :)', k, s, p);  
 end

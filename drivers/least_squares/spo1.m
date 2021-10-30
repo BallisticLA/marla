@@ -40,7 +40,7 @@ function [res, log] = spo1(A, b, sampling_factor, tol, iter_lim, logging)
     "logging".
     %}
     if ~logging
-        disp('Optional parameter for logging detailed information has not been passed.'); 
+        %disp('Optional parameter for logging detailed information has not been passed.'); 
     end
     
     [num_rows, num_cols] = size(A);
@@ -64,8 +64,7 @@ function [res, log] = spo1(A, b, sampling_factor, tol, iter_lim, logging)
     if logging, tic, end
     b_ske = Omega * b;
     x_ske = R \ (Q' * b_ske);
-    disp(x_ske);
-    x0 = int16.empty;
+    x0 = zeros(size(A, 2), 1);
     
     if norm(A * x_ske - b, 'fro') < norm(b)
         x0 = x_ske;
@@ -103,7 +102,7 @@ end
 % Helper routine. 
 function [d] = dim_checks(sampling_factor, num_rows, num_cols)
     assert(num_rows >= num_cols);
-    d = cast((sampling_factor * num_cols), 'uint8');
+    d = cast((sampling_factor * num_cols), 'uint32');
     if d > num_rows
         fprintf(['The embedding dimension "d" should not be larger than the', ... 
         'number of rows of the data matrix. Here, an embedding dimension', ...

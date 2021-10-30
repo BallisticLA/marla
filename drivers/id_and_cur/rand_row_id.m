@@ -1,4 +1,4 @@
-function [J, V] = rand_row_ID(A, k, s, p) 
+function [J, V] = rand_row_is(A, k, s, p) 
     %{
     Computes row Interpolative Decomposition of matrix A.
     Rank-k approximation of A is then present as:

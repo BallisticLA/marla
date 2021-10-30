@@ -1,4 +1,4 @@
-function [Q, B] = rand_QB_B(A, block_size, tol, k, p)
+function [Q, B] = rand_qb_b(A, block_size, tol, k, p)
 %{
 Iteratively build an approximate QB factorization of A,
 which terminates once one of the following conditions
@@ -52,6 +52,8 @@ Algorithm 2 from YGL:2018.
         fprintf('The input matrix is empty.');
         return
     end
+    % Setting initial error to zero.
+    approximation_error = 0;
     class_A = class(A);
     [m, n] = size(A);
     norm_B = 0;
