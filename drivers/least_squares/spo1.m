@@ -58,31 +58,23 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
         %   norm of b, which affects termination criteria.  
         if logging, tic, end
         b_ske = Omega * b;
-        x_ske = N * (U(:, 1:rank)' * b_ske);
+        z_ske = (U(:, 1:rank)' * b_ske);
+        x_ske = N * z_ske;
         b_remainder = b - A * x_ske;
-        success = norm(b_remainder, 2) < norm(b, 2);
+        if norm(b_remainder, 2) >= norm(b, 2)
+            z_ske = zeros(size(A, 2), 1);
+        end
         if logging, log.t_presolve = toc; end
         
         % Iterative phase.
-        if success
-           % x_ske is a better starting point than the zero vector. 
-           if logging, tic, end
-           [x_star, iters, resvec] = cgls(A, b_remainder, tol, iter_lim, N, x_ske);
-           x_star = x_star + ske;
-           if logging, log.t_iterate = toc; end 
-        else
-           % The zero vector is at least as good as x_ske. 
-           if logging, tic, end
-           x0 = zeros(size(A, 2), 1);
-           [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, x0);
-           if logging, log.t_iterate = toc; end 
-        end
+       if logging, tic, end
+       [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, z_ske);
+       if logging, log.t_iterate = toc; end 
     else
-        % Iterative phase.
-        if logging, tic, end
-        x0 = zeros(size(A, 2), 1);
-        [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, x0);
-        if logging, log.t_iterate = toc; end 
+        % No presolve
+       if logging, tic, end
+       [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, zeros(size(A, 2), 1));
+       if logging, log.t_iterate = toc; end 
     end
     
     if logging
