@@ -12,7 +12,7 @@ function [] = test_least_squares()
     test1.A = A;
     test1.U = U;
     test1.s = s;
-    test1.V = Vt';
+    test1.Vt = Vt;
     test1.x_opt = x;
     test1.b = A * x;
 
@@ -24,13 +24,13 @@ function [] = test_least_squares()
     U = qr(U, 0);
     s = diag(rand(rank, 1) + 1e-4);
     V = randn(n, rank);
-    V = qr(V, 0);
-    A = (U * s) * V';
+    Vt = (qr(V, 0))';
+    A = (U * s) * Vt;
     x = randn(n, 1);
     test2.A = A;
     test2.U = U;
     test2.s = s;
-    test2.V = V;
+    test2.Vt = Vt;
     test2.x_opt = x;
     test2.b = A * x;
    
@@ -40,13 +40,13 @@ function [] = test_least_squares()
     U = qr(U, 0);
     s = diag(rand(n, 1) + 1e-4);
     V = randn(n, n);
-    V = qr(V, 0);
-    A = (U * s) * V';
+    Vt = (qr(V, 0))';
+    A = (U * s) * Vt;
     x = randn(n, 1);
     test3.A = A;
     test3.U = U;
     test3.s = s;
-    test3.V = V;
+    test3.Vt = Vt;
     test3.x_opt = x;
     test3.b = A * x;    
 
@@ -56,15 +56,15 @@ function [] = test_least_squares()
     U = randn(m, n);
     U = qr(U, 0);
     V = randn(n, n);
-    V = qr(V, 0); 
+    Vt = (qr(V, 0))'; 
     s = diag(rand(n, 1) + 1e-4);
-    A = U * s * V';
+    A = U * s * Vt;
     b = randn(m, 1);
     b = b - U * (U' * b);
     test4.A = A;
     test4.U = U;
     test4.s = s;
-    test4.V = V;
+    test4.Vt = Vt;
     test4.b = b * 1e2 / norm(b, 2);
     test4.x_opt = zeros(n, 1); 
     
@@ -80,8 +80,8 @@ function [] = test_least_squares()
     U = randn(m, n);
     U = qr(U, 0);
     V = randn(n, n);
-    V = qr(V, 0); 
-    test5.A = (U * spec) * V';
+    Vt = (qr(V, 0))'; 
+    test5.A = (U * spec) * Vt;
     % Make b
     hi_x = randn(num_hi, 1) / 1e5;
     lo_x = randn(num_lo, 1);
@@ -92,7 +92,7 @@ function [] = test_least_squares()
     test5.A = A;
     test5.U = U;
     test5.s = s;
-    test5.V = V;
+    test5.Vt = Vt;
     test5.x_opt = x;
     test5.b = A * x + b_orth;
     
@@ -100,27 +100,23 @@ function [] = test_least_squares()
     %test_spo2(test1, test2, test3, test4, test5);
 end
 
-function[] = test_sso1(test1, test2, test3, test4, test5)
-    addpath('../../drivers/least_squares/');
-end
-
 function[] = test_spo1(test1, test3, test4, test5)
     addpath('../../drivers/least_squares/');
 
         % consistent_tall
-        test1.x_approx = spo1(test1.A, test1.b, 1, 0.0, 1, 0);
+        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, 0);
         run_consistent(test1, 1e-12);
 
         % consistent_square
-        test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 1, 0);
+        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, 0);
         run_consistent(test3, 1e-12);
 
         % inconsistent_orthog
-        test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 0);
+        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, 0);
         run_inconsistent(test4, 1e-6);
 
         % inconsistent_gen
-        test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 100, 0);
+        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, 0);
         run_inconsistent(test5, 1e-6);
 end
 
@@ -128,34 +124,38 @@ function[] = test_spo2(test1, test2, test3, test4, test5)
     addpath('../../drivers/least_squares/');
 
         % consistent_tall()
-        test1.x_approx = spo2(test1.A, test1.b, 3, 1e-12, 100, 0, 0);
+        test1.x_approx = spo1(test1.A, test1.b, 3, 1e-12, 100, 0, 0);
         run_consistent(test1, 1e-6)
-        test1.x_approx = spo2(test1.A, test1.b, 1, 0.0, 1, 1, 0);
+        test1.x_approx = spo1(test1.A, test1.b, 1, 0.0, 1, 1, 0);
         run_consistent(test1, 1e-12);
 
         % consistent_lowrank
-        test2.x_approx = spo2(test2.A, test2.b, 3, 0.0, 100, 0, 0);
+        test2.x_approx = spo1(test2.A, test2.b, 3, 0.0, 100, 0, 0);
         run_consistent(test2, 1e-6);
-        test2.x_approx = spo2(test2.A, test2.b, 1, 0.0, 1, 1, 0);
+        test2.x_approx = spo1(test2.A, test2.b, 1, 0.0, 1, 1, 0);
         run_consistent(test2, 1e-12);
 
         % consistent_square
-        test3.x_approx = spo2(test3.A, test3.b, 1, 0.0, 100, 0, 0);
+        test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 100, 0, 0);
         run_consistent(test3, 1e-6);
-        test3.x_approx = spo2(test3.A, test3.b, 1, 0.0, 1, 1, 0);
+        test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 1, 1, 0);
         run_consistent(test3, 1e-12)
 
         % inconsistent_orthog
-        test4.x_approx = spo2(test4.A, test4.b, 3, 1e-12, 100, 0, 0);
+        test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 0, 0);
         run_inconsistent(test4, 1e-6);
-        test4.x_approx = spo2(test4.A, test4.b, 1, 1e-12, 100, 1, 0);
+        test4.x_approx = spo1(test4.A, test4.b, 1, 1e-12, 100, 1, 0);
         run_inconsistent(test4, 1e-6);
 
         % inconsistent_gen
-        test5.x_approx = spo2(test5.A, test5.b, 3, 1e-12, 100, 0, 0);
+        test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 100, 0, 0);
         run_inconsistent(test5, 1e-6);
-        test5.x_approx = spo2(test5.A, test5.b, 1, 1e-12, 50, 1, 0);
+        test5.x_approx = spo1(test5.A, test5.b, 1, 1e-12, 50, 1, 0);
         run_inconsistent(test5, 1e-6);
+end
+
+function[] = test_sso1(test1, test2, test3, test4, test5)
+    addpath('../../drivers/least_squares/');
 end
 
 function[] = run_inconsistent(self, test_tol)
@@ -171,10 +171,10 @@ function[] = run_consistent(self, test_tol)
 end
 
 function[] = test_x_angle(self, tol)
-    %x' x_opt >= (1 - tol)*||x|| ||x_opt||
-    y_opt = (self.V)' * self.x_opt;
+    % x' x_opt >= (1 - tol)*||x|| ||x_opt||
+    y_opt = self.Vt * self.x_opt;
     norm_y_opt = norm(y_opt, 2);
-    y = (self.V)' * self.x_approx;
+    y = self.Vt * self.x_approx;
     norm_y = norm(y, 2);
     if norm_y_opt < 1e-8
         % Norm is too small to accurately compute cosine
@@ -189,8 +189,8 @@ end
 
 function[] = test_x_norm(self, tol)
     % (1 - tol)*||x_opt|| <= ||x|| <= (1+tol)*||x_opt|| + tol
-    nrm = norm((self.V)' * self.x_approx, 2);
-    norm_opt = norm((self.V)' * self.x_approx, 2);
+    nrm = norm(self.Vt * self.x_approx, 2);
+    norm_opt = norm(self.Vt * self.x_approx, 2);
     assert(nrm <= ((1+tol)*norm_opt + tol));
     assert(((1-tol)*norm_opt) <= nrm);    
 end
