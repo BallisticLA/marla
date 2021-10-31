@@ -1,6 +1,6 @@
 % Throws an asserion error if something went wrong.
 function [] = test_qb()
-    addpath('../Matrix_Generators/');
+    addpath('../matrix_generators/');
     % tall_low_exact_rank
     test1.k = 15;
     test1.A = gen_test_mat(200, 50, test1.k, 0); 
@@ -40,7 +40,7 @@ function [] = test_qb()
 end
 
 function[] = test_rand_qb(test1, test2, test3, test4, test5, test6, test7)
-    addpath('../../Comps/QB/');
+    addpath('../../comps/qb/');
     alg_tol = 1e-8;
     p = 1;
     % Run the above algorithm on tall matrices, wide matrices,
@@ -79,7 +79,7 @@ function[] = test_rand_qb(test1, test2, test3, test4, test5, test6, test7)
 end
 
 function[] = test_rand_qb_b(test1, test2, test3, test4, test5, test6, test7)
-    addpath('../../Comps/QB/');
+    addpath('../../comps/qb/');
     alg_tol = 1e-8;
     test_tol = 1e-8;
     block_size = 5;
@@ -120,7 +120,7 @@ function[] = test_rand_qb_b(test1, test2, test3, test4, test5, test6, test7)
 end
 
 function[] = test_rand_qb_b_pe(test1, test2, test3, test4, test5, test6, test7)
-    addpath('../../Comps/QB/');
+    addpath('../../comps/qb/');
     alg_tol = 1e-8;
     test_tol = 1e-8;
     block_size = 5;
@@ -161,7 +161,7 @@ function[] = test_rand_qb_b_pe(test1, test2, test3, test4, test5, test6, test7)
 end
 
 function[] = test_rand_qb_sp(test1, test2, test3, test4, test5, test6, test7)
-    addpath('../../Comps/QB/');
+    addpath('../../comps/qb/');
     alg_tol = 1e-8;
     % Run the above algorithm on tall matrices, wide matrices,
     % and matrices with varying types of spectral decay.

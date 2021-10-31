@@ -44,12 +44,13 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
     
     % Factor the sketch. 
     %  We also measure the time to scale the right singular vectors
-    %   as needed for the preconditioner. SAP1 doesn't have a
-    %   directly comparable cost.
+    %   as needed for the preconditioner.
     if logging, tic, end
-    [U, S, V] = svd(A_ske, 'econ', 'vector');
+    [U, S, V] = svd(A_ske, 'econ');
+    S = diag(S);
     rank = nnz(S > S(1) * num_cols * eps('double'));
-    N = bsxfun(@rdivide, V(1:rank, :)', S(1:rank));
+    N = V(:, 1:rank) ./ (S(1:rank)');
+    %N = bsxfun(@rdivide, V(:, 1:rank), S(1:rank));
     if logging, log.t_factor = toc; end
     
     if smart_init
@@ -67,9 +68,9 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
         if logging, log.t_presolve = toc; end
         
         % Iterative phase.
-       if logging, tic, end
-       [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, z_ske);
-       if logging, log.t_iterate = toc; end 
+        if logging, tic, end
+        [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, x_ske);
+        if logging, log.t_iterate = toc; end 
     else
         % No presolve
        if logging, tic, end
@@ -101,12 +102,14 @@ end
 
 function[x, iter, resid_vec] = cgls(A, b, tol, iter_lim, precond, x)
     r = b - A * x;
+    b_nrm = norm(b);
     p = precond' * (A' * r);
     s = p;
     curr_tol = norm(s, 2)^2;
+    stop_tol = (tol*b_nrm)^2;
     resid_vec = [curr_tol];
     iter = 0;
-    while curr_tol > tol
+    while curr_tol > stop_tol
         t = precond * p;
         q = A * t;
         alpha = curr_tol / norm(q, 2)^2;

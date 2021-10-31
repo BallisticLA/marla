@@ -21,12 +21,12 @@ function[Omega] = sjlt(num_rows, num_cols, nnz)
     % nnz = 8;
     
     % Ensuring type compatabilities. 
-    num_cols = cast(num_cols, 'uint32');
-    num_rows = cast(num_rows, 'uint32');
-    nnz = cast(nnz, 'uint32');
+    num_cols = cast(num_cols, 'double');
+    num_rows = cast(num_rows, 'double');
+    nnz = cast(nnz, 'double');
     
     if num_cols >= num_rows
-        rows = uint32.empty;
+        rows = double.empty;
         nnz = min(num_cols, nnz);
         bad_size = num_rows < nnz;
         if bad_size
