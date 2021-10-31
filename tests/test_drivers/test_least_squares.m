@@ -100,7 +100,7 @@ function [] = test_least_squares()
     test5.x_opt = x;
     test5.b = A * x + b_orth;
     
-    %test_spo3(test1, test3, test4, test5);
+    test_spo3(test1, test3, test4, test5);
     test_spo1(test1, test2, test3, test4, test5);
 end
 
@@ -156,10 +156,6 @@ function[] = test_spo1(test1, test2, test3, test4, test5)
         run_inconsistent(test5, 1e-6);
         test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 50, 1, 0);
         run_inconsistent(test5, 1e-6);
-end
-
-function[] = test_sso1(test1, test2, test3, test4, test5)
-    addpath('../../drivers/least_squares/');
 end
 
 function[] = run_inconsistent(self, test_tol)
@@ -230,28 +226,3 @@ function[] = test_normal_eqs(self, tol)
     nrm = norm(gap, 2);
     assert(nrm <= tol);
 end
-%{
-function[] = test_convergence_rate(self, seed)
-    addpath('../Matrix_Generators/');
-    n_rows = 1000;
-    % least 10x more rows than cols
-    n_cols = 50; 
-    A = gen_simp_mat(n_rows, n_cols, 5);
-    x0 = randn(n_cols, 1);
-    b0 = A * x0;
-    b = b0 + 0.05 * randn(n_rows, 1);
-    x_star = la.lstsq(A, b)[0]
-    errors = []
-    sampling_factors = arange(start=1, stop=10, step=10 / n_cols)
-    for sf in sampling_factors:
-        sas.sampling_factor = sf
-        x_ske = sas(A, b, tol=np.NaN, iter_lim=1, rng=rng)
-        err = la.norm(x_ske - x_star)
-        errors.append(err)
-    errors = np.array(errors)
-    coeffs, r2 = ustats.loglog_fit(sampling_factors, errors)
-    % at least 1/sqrt(d)
-    self.assertLessEqual(coeffs[1], -0.5) 
-    self.assertGreaterEqual(r2, 0.7)
-end
-%}
