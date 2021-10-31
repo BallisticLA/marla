@@ -51,7 +51,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
     addpath('../../Utils/Sketching_Operators')
-    Omega = sjlt(d, num_rows, 8);
+    Omega = sjlt(double(d), double(num_rows), double(8));
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
     
@@ -72,7 +72,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
     
     % Iterative phase.
     if logging, tic, end
-    [res, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, R, eye(size(R, 1)), z_ske);
+    [res, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, R, eye(size(R, 1)), x_ske);
     if logging, log.t_iterate = toc; end    
     
     if logging

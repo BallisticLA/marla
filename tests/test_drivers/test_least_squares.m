@@ -1,6 +1,6 @@
 % Throws an asserion error if something went wrong.
 function [] = test_least_squares()
-    addpath('../Matrix_Generators/');
+    addpath('../matrix_generators/');
 
     % consistent_tall
     m = 100;
@@ -21,10 +21,11 @@ function [] = test_least_squares()
     n = 10;
     rank = 5;
     U = randn(m, rank);
-    U = qr(U, 0);
+    [U,~] = qr(U, 0);
     s = diag(rand(rank, 1) + 1e-4);
     V = randn(n, rank);
-    Vt = (qr(V, 0))';
+    [V,~] = qr(V, 0);
+    Vt = V';
     A = (U * s) * Vt;
     x = randn(n, 1);
     test2.A = A;
@@ -36,11 +37,12 @@ function [] = test_least_squares()
    
     % consistent_square
     n = 10;
-    U = randn(n, n);
-    U = qr(U, 0);
     s = diag(rand(n, 1) + 1e-4);
+    U = randn(m, n);
+    [U,~] = qr(U, 0);
     V = randn(n, n);
-    Vt = (qr(V, 0))';
+    [V, ~] = qr(V, 0);
+    Vt = V'; 
     A = (U * s) * Vt;
     x = randn(n, 1);
     test3.A = A;
@@ -54,9 +56,10 @@ function [] = test_least_squares()
     m = 1000;
     n = 100;
     U = randn(m, n);
-    U = qr(U, 0);
+    [U,~] = qr(U, 0);
     V = randn(n, n);
-    Vt = (qr(V, 0))'; 
+    [V, ~] = qr(V, 0);
+    Vt = V'; 
     s = diag(rand(n, 1) + 1e-4);
     A = U * s * Vt;
     b = randn(m, 1);
@@ -78,10 +81,11 @@ function [] = test_least_squares()
     lo_spec = ones(1, num_lo) + rand(1, num_lo);
     spec = diag(cat(2, hi_spec, lo_spec));
     U = randn(m, n);
-    U = qr(U, 0);
+    [U,~] = qr(U, 0);
     V = randn(n, n);
-    Vt = (qr(V, 0))'; 
-    test5.A = (U * spec) * Vt;
+    [V,~] = qr(V, 0);
+    Vt = V';
+    A = (U * spec) * Vt;
     % Make b
     hi_x = randn(num_hi, 1) / 1e5;
     lo_x = randn(num_lo, 1);
@@ -96,11 +100,11 @@ function [] = test_least_squares()
     test5.x_opt = x;
     test5.b = A * x + b_orth;
     
-    test_spo1(test1, test3, test4, test5);
-    %test_spo2(test1, test2, test3, test4, test5);
+    %test_spo3(test1, test3, test4, test5);
+    test_spo1(test1, test2, test3, test4, test5);
 end
 
-function[] = test_spo1(test1, test3, test4, test5)
+function[] = test_spo3(test1, test3, test4, test5)
     addpath('../../drivers/least_squares/');
 
         % consistent_tall
@@ -120,7 +124,7 @@ function[] = test_spo1(test1, test3, test4, test5)
         run_inconsistent(test5, 1e-6);
 end
 
-function[] = test_spo2(test1, test2, test3, test4, test5)
+function[] = test_spo1(test1, test2, test3, test4, test5)
     addpath('../../drivers/least_squares/');
 
         % consistent_tall()
@@ -144,13 +148,13 @@ function[] = test_spo2(test1, test2, test3, test4, test5)
         % inconsistent_orthog
         test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 0, 0);
         run_inconsistent(test4, 1e-6);
-        test4.x_approx = spo1(test4.A, test4.b, 1, 1e-12, 100, 1, 0);
+        test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 1, 0);
         run_inconsistent(test4, 1e-6);
 
         % inconsistent_gen
         test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 100, 0, 0);
         run_inconsistent(test5, 1e-6);
-        test5.x_approx = spo1(test5.A, test5.b, 1, 1e-12, 50, 1, 0);
+        test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 50, 1, 0);
         run_inconsistent(test5, 1e-6);
 end
 
