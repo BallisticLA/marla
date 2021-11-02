@@ -44,20 +44,23 @@ computational routine. Tolerance and block size parameters are not required
 for some QB implementations.
 %}
     % Using a version of QB algorithm. Alternative versions may be found in
-    % '../Comps/QB'. 
-    addpath('../Comps/QB');
-    [Q, B] = rand_QB(A, k + s, p);
+    % '../comps/qb'. 
+    addpath('../comps/qb');
+    [Q, B] = rand_qb_b(A, block_size, tol, k, p);
     % Using a built-in function for computing an SVD. 
-    [U, S, V] = svd(B, 'vector');
+    [U, S, V] = svd(B);
+
     % Removing singular values below machine precision. 
-    cutoff = find(S < eps(class(S)), 1);
+    cutoff = find(diag(S) < eps(class(S)), 1);
     % Removing "oversampled" data. 
     if s > 0
         cutoff = min(k, cutoff);
     end
-    U = U(:, 1:cutoff);
-    S = S(1:cutoff);
-    V = V(1:cutoff, :);
-    % Adjusting matrix U. 
+    if(~isempty(cutoff))
+        U = U(:, 1:cutoff);
+        S = S(1:cutoff, 1:cutoff);
+        V = V(:, 1:cutoff);
+    end
+    % Adjusting matrix U.
     U = Q * U;
 end

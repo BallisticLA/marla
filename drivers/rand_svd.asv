@@ -1,0 +1,224 @@
+function [U, S, V] = rand_svd(A, k, s, p, tol, block_size)
+%{
+Return U, S, V where, for some integer ell <= k,
+    U is size(A, 1)-by-ell,
+    S is a vector of length ell,
+    V is ell-by-size(A, 2),
+    so that
+    A \approx U * diag(S) * V
+Parameters
+----------
+A : matrix
+    Data matrix to approximate
+k : int
+    The returned SVD will be truncated to at most rank k:
+    0 < k <= min(size(A)). Setting k=min(size(A)) and s=0
+    ensures ||A - U * diag(S) * V|| / ||A|| <= tol on exit. However,
+    setting k=min(size(A)) may trivially return the SVD of
+    A in some implementations.
+s : int
+    The randomized part of the algorithm uses k+s as the target rank;
+    we require over >= 0 and k+s <= min(size(A)).
+    In a conformant implementation, that part of the algorithm will
+    never return a factorization of rank greater than k+over.
+    Setting over > 0 will likely result in truncating the SVD obtained
+    from the randomized part of the algorithm. If you want to control
+    the truncation step yourself, then you should set over=0 and
+    increase the value of k. E.g., a function call with over=5 and
+    k=20 can avoid truncation by setting k=25 and over=0.
+p : int
+    Number of power iterations used. Using this algorithm version
+    implies increase of the number of passes over matrix A by 2 with each
+    power iteration. 
+tol : float
+    The target error used by the randomized part of the algorithm.
+    When over = 0, this parameter controls ||A - U @ diag(s) @ Vh||.
+    The precise meaning of "tol" when over > 0 is implementation
+block_size : int
+    The block size for a blocked QB algorithm. Add this many columns
+    to Q at each iteration (except possibly the final iteration).
+    dependent.
+
+This implementation of rand_SVD uses versions of QB algorithm as its main 
+computational routine. Tolerance and block size parameters are not required 
+for some QB implementations.
+%}
+    % Using a version of QB algorithm. Alternative versions may be found in
+    % '../comps/qb'. 
+    %addpath('../comps/qb');
+    [Q, B] = rand_qb(A, k + s, p);
+    % Using a built-in function for computing an SVD. 
+    [U, S, V] = svd(B, 'vector');
+    % Removing singular values below machine precision. 
+    cutoff = find(S < eps(class(S)), 1);
+    % Removing "oversampled" data. 
+    if s > 0
+        cutoff = min(k, cutoff);
+    end
+    if(~isempty(cutoff))
+        U = U(:, 1:cutoff);
+        S = S(1:cutoff);
+        V = V(1:cutoff, :);
+    end
+    % Adjusting matrix U.
+    U = Q * U;
+    % Updating S to a square matrix.
+    S = diag(S);
+
+    disp(norm(A - U * S * V', 'fro'));
+end
+
+function [Q, B] = rand_qb(A, k, p)
+%{
+Return matrices (Q, B) from a rank-k QB factorization of A.
+----------
+A : matrix
+    Data matrix to approximate.
+k : int
+    Target rank for the approximation of A: 0 < k < min(size(A)).
+    This parameter includes any oversampling. For example, if you
+    want to be near the optimal (Eckhart-Young) error for a rank 20
+    approximation of A, then you might want to set k=25.
+p : int
+    Number of power iterations used. Using this algorithm version
+    implies increase of the number of passes over matrix A by 2 with each
+    power iteration. 
+Returns
+-------
+Q : matrix
+    Has size (size(A, 1), k). Columns are orthonormal.
+B : matrix
+    Has shape (k, size(A, 2)).
+----------
+This algorithm computes Q and then sets B = Q.T @ A. Conceptually, we
+compute Q by using Algorithm 4.3 (see also Algorithm 4.4) from
+    Halko, Nathan, Per-Gunnar Martinsson, and Joel A. Tropp.
+    "Finding structure with randomness: Probabilistic algorithms for
+    constructing approximate matrix decompositions."
+    SIAM review 53.2 (2011): 217-288.
+    (available at `arXiv <http://arxiv.org/abs/0909.4061>`_).
+The precise subspace iteration technique is similar to that of Algorithm
+3.3 from
+     Bolong Zhang and Michael Mascagni.
+     "Pass-Efficient Randomized LU Algorithms for Computing Low-Rank
+     Matrix Approximation"
+     arXiv:2002.07138 (2020).
+The main difference between this implementation and Zhang and
+Mascagni's Algorithm 3.3: we use QR decompositions where they use LU
+decompositions. 
+Additionally, using an alternative sketching scheme from
+'../rangefinders' would allow 0 steps or 1 step of
+subspace iteration, where Zhang and Mascagni's Algorithm
+implementation requires >= 2 steps.
+%}
+    
+    % Sketch construction stage - alternative options are available in 
+    %'../rangefinders'.
+    class_A = class(A);
+    [~, n] = size(A);
+    % By default, a Gaussian random sketching matrix is used.
+    % Alternative choices are present in '../Sketching_Operators'
+    Omega = randn(n, k, class_A);
+    [Q, ~] = qr(A * Omega, 0);
+
+    for j = 1 : p
+        [Q, ~] = qr(A' * Q, 0);
+        [Q, ~] = qr(A * Q, 0);
+    end
+    % Stage of computing B deterministically. 
+    B = Q' * A;
+end
+
+function [Q, B] = rand_qb_b(A, block_size, tol, k, p)
+%{
+Iteratively build an approximate QB factorization of A,
+which terminates once one of the following conditions
+is satisfied
+    (1)  || A - Q B ||_Fro / ||A|| <= tol
+or
+    (2) Q has k columns.
+or
+    (2) || A - Q B ||_Fro / ||A|| has increased in comparison to previous
+    iteration's result (unlikely case). 
+Each iteration involves sketching A from the right by a sketching
+matrix with "block_size" columns, and using "p" power iterations. 
+Parameters
+----------
+A : matrix
+    Data matrix to approximate.
+block_size : int
+    The block size in this blocked QB algorithm. Add this many columns
+    to Q at each iteration (except possibly the final iteration).
+tol : float
+    Terminate if ||A - Q B||_Fro / ||A|| <= tol. Setting k = min(size(A)) is a
+    valid way of ensuring ||A - Q B||_Fro / ||A|| <= tol on exit.
+k : int
+    Terminate if size(Q, 2) == k. Assuming k < rank(A), setting tol=0 is a
+    valid way of ensuring size(Q, 2) == k on exit.
+p : int
+    Number of power iterations used. Using this algorithm version
+    implies increase of the number of passes over matrix A by 2 with each
+    power iteration. 
+Returns
+-------
+Q : matrix
+    Has the same number of rows of A, and orthonormal columns.
+B : matrix
+    Has the same number of columns of A.
+Notes
+-----
+The number of columns in Q increase by "block_size" at each iteration, unless
+that would bring size(Q, 2) > k. In that case, the final iteration only
+adds enough columns to Q so that size(Q, 2) == k.
+We perform p steps of subspace iteration for each
+block of the QB factorization. We stabilize subspace iteration with
+QR factorization at each step.
+References
+----------
+Algorithm 2 from YGL:2018.
+%}
+    norm_A = norm(A, 'fro');
+    % Early termination check on an empty input. 
+    if norm_A == 0
+        fprintf('The input matrix is empty.');
+        return
+    end
+    % Setting initial error to zero.
+    approximation_error = 0;
+    class_A = class(A);
+    [m, n] = size(A);
+    norm_B = 0;
+    % Pre-initialization of output matrices. 
+    Q = zeros(m, 0, class_A);
+    B = zeros(0, n, class_A);
+    % Iterative stage.
+    for i = 1 : (k / block_size)
+        % Consstructiong a sketch for current iteration. 
+        Omega_i = randn(n, block_size, class_A);
+        [Q_i, ~] = qr((A * Omega_i) - (Q * (B * Omega_i)), 0);
+        % Power iterations. 
+        for j = 1 : p
+            [Q_i, ~] = qr(A' * Q_i - B' * (Q' * Q_i), 0);
+            [Q_i, ~] = qr(A * Q_i - Q * (B * Q_i), 0);
+        end
+        % Ensuring orthogonalization of Q. 
+        [Q_i, ~] = qr(Q_i - (Q * (Q' * Q_i)), 0);
+        % Deterministic computation of B_i.
+        B_i = Q_i' * A;
+        % Approximation error check.
+        norm_B = hypot(norm_B, norm(B_i, 'fro'));
+        prev_error = approximation_error;
+        approximation_error = sqrt(abs(norm_A - norm_B) * (norm_A + norm_B)) / norm_A; 
+        % Handling the round-off error accumulation.
+        if (i > 1) && (approximation_error > prev_error)
+            break
+        end
+        % Output update. 
+        Q = [Q, Q_i]; %#ok<AGROW>
+        B = [B; B_i]; %#ok<AGROW>
+        % Condition of reaching tolerance. 
+        if approximation_error < tol       
+            break;
+        end
+    end
+end
