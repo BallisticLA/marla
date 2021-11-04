@@ -1,4 +1,4 @@
-function [U, S, V] = rand_svd(A, k, s, p, tol, block_size)
+function [U, S, V] = svd1(A, k, s, p, tol, block_size)
 %{
 Return U, S, V where, for some integer ell <= k,
     U is size(A, 1)-by-ell,
@@ -61,6 +61,7 @@ for some QB implementations.
         S = S(1:cutoff, 1:cutoff);
         V = V(:, 1:cutoff);
     end
+    
     % Adjusting matrix U.
     U = Q * U;
 end

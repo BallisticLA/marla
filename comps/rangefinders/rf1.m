@@ -1,4 +1,4 @@
-function [Q] = rangefinder(A, k, p)
+function [Q] = rf1(A, k, p)
     %{
     Standard routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 

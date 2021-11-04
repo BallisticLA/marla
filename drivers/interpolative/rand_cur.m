@@ -23,11 +23,13 @@ function [C, U, R] = rand_cur(A, k, s, p)
     ----------
     Section 2.5 of https://arxiv.org/pdf/1502.05366.pdf - RSVDPACK notes.
     %}
-    [J_r, ~] = rand_row_ID(A, k, s, p);
-    R = A(J_r(1 : (k + s)), :);
+    addpath('../../comps/interpolative/');
+    Js = rocs1(A, k, s, p, 0);
+    R = A(Js(1 : k), :);
+
+    % By default, uses osid1. 
+    [Z, Is] = osid1(R', k, s, p, 0);
+    C = A(:, Is(:, 1 : k));
     
-    [J_c, V_c] = rand_row_ID(R', k, s, p);
-    C = A(:, J_c(:, 1 : (k + s)));
-    
-    U = V_c' / R;
+    U = Z' / R;
 end
