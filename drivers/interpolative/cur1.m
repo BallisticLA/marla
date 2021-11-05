@@ -1,4 +1,4 @@
-function[Js, U, Is] = curd2(A, k, s, p)
+function[Js, U, Is] = cur1(A, k, s, p)
 %{
     Computes CUR Decomposition of matrix A.
     Relies on row ID algorithm.
