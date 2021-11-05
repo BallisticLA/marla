@@ -7,7 +7,6 @@ function [] = test_least_squares()
     n = 10;
     A = gen_simp_mat(m, n, 1);
     [U, s, Vt] = svd(A);
-    size(A)
     x = randn(n, 1);
     test1.A = A;
     test1.U = U;
@@ -107,20 +106,37 @@ end
 function[] = test_spo3(test1, test3, test4, test5)
     addpath('../../drivers/least_squares/');
 
-        % consistent_tall
-        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, 0);
+        % consistent_tall, QR
+        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, false,  0);
         run_consistent(test1, 1e-12);
 
-        % consistent_square
-        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, 0);
+        % consistent_square, QR
+        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, false, 0);
         run_consistent(test3, 1e-12);
 
-        % inconsistent_orthog
-        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, 0);
+        % inconsistent_orthog, QR
+        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, false, 0);
         run_inconsistent(test4, 1e-6);
 
-        % inconsistent_gen
-        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, 0);
+        % inconsistent_gen, QR
+        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, false, 0);
+        run_inconsistent(test5, 1e-6);
+        
+        
+        % consistent_tall, QR
+        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, true,  0);
+        run_consistent(test1, 1e-12);
+
+        % consistent_square, QR
+        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, true, 0);
+        run_consistent(test3, 1e-12);
+
+        % inconsistent_orthog, QR
+        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, true, 0);
+        run_inconsistent(test4, 1e-6);
+
+        % inconsistent_gen, QR
+        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, true, 0);
         run_inconsistent(test5, 1e-6);
 end
 
