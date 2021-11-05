@@ -1,13 +1,16 @@
-function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
+function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, logging)
     %{
     A sketch-and-precondition approach to overdetermined ordinary least
-    squares. This implementation uses QR to obtain the preconditioner and
-    it uses LSQR for the iterative method.
+    squares. This implementation uses QR (when use_chol=false) or Cholesky
+    (when use_chol=true) to obtain the preconditioner. This implementation
+    uses LSQR for the iterative method.
 
-    Before starting LSQR, we run a basic sketch-and-solve (for free, given
-    our QR decomposition of the sketched data matrix) to obtain a solution
-    x_ske. If ||A * x_ske - b||_2 < ||b||_2, then we initialize LSQR at x_ske.
+    Before starting LSQR, we run a basic sketch-and-solve (essentially for
+    free) to obtain a solution x_ske. If ||A * x_ske - b||_2 < ||b||_2,
+    then we initialize LSQR at x_ske.
+ 
     This implementation assumes A is full rank.
+
     References
     ----------
     This implementation was inspired by Blendenpik (AMT:2010). The differences
@@ -44,7 +47,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
     end
     
     [num_rows, num_cols] = size(A);
-    d = dim_checks(sampling_factor, num_rows, num_cols);
+    d = lstsq_dim_checks(sampling_factor, num_rows, num_cols);
     
     % Sketch the data matrix.
     if logging, tic, end
@@ -57,13 +60,23 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
     
     % Factor the sketch.
     if logging, tic, end 
-    [Q, R] = qr(A_ske, 0);
+    if ~use_chol
+        [Q, R] = qr(A_ske, 0);
+    else
+        % It would be better to call "syrk" from BLAS when forming the
+        % Gram matrix
+        R = chol(A_ske' * A_ske, 'upper');
+    end
     if logging, log.t_factor = toc; end
     
     % Sketch-and-solve type preprocessing.
     if logging, tic, end
     b_ske = Omega * b;
-    z_ske = Q' * b_ske;
+    if ~use_chol
+        z_ske = Q' * b_ske;
+    else
+        z_ske = R' \ (A_ske' * b_ske);
+    end
     x_ske = R \ z_ske;
     if norm(A * x_ske - b, 'fro') >= norm(b)
         z_ske = zeros(size(A, 2), 1);
@@ -96,19 +109,4 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, logging)
         log.x = res;
         log.arnorms = [ar0norm; resvec];
     end
-end
-
-% Helper routine. 
-function [d] = dim_checks(sampling_factor, num_rows, num_cols)
-    assert(num_rows >= num_cols);
-    d = cast((sampling_factor * num_cols), 'uint32');
-    if d > num_rows
-        fprintf(['The embedding dimension "d" should not be larger than the', ... 
-        'number of rows of the data matrix. Here, an embedding dimension', ...
-        'of d=%d has been requested for a matrix with only %d rows.', ...
-        'We will proceed by setting d=%d. This parameter choice will', ...
-        'result in a very inefficient algorithm!'], d, num_rows, num_rows);
-        d = num_rows; 
-    end
-    assert(d >= num_cols);
 end
