@@ -12,10 +12,10 @@ function[Z, Is, X, Js] = tsid1(A, k, s, p)
     % Relies on a computational routine qrcp_osid
     addpath('../../comps/interpolative/');
     if size(A, 1) > size(A, 2)
-        [X, Js] = osid1(A, k, s, p, 0);
+        [X, Js] = osid1(A, k, s, p, 1);
         [Z, Is] = qrcp_osid(A(:, Js), k, 0);
     else
-        [Z, Is] = osid(A, k, s, p, 1);
-        [X, Js] = qrcp_osid(A(Is, :), k);
+        [Z, Is] = osid1(A, k, s, p, 0);
+        [X, Js] = qrcp_osid(A(Is, :), k, 1);
     end
 end
