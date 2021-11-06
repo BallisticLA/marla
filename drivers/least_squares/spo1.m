@@ -95,6 +95,6 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
         ar0 = N' * (A' * b);
         ar0norm = norm(ar0, 'fro');
         log.x = x_star;
-        log.arnorms = [ar0norm; resvec];
+        log.errors = [ar0norm; resvec];
     end
 end

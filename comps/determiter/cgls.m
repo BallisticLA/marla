@@ -5,8 +5,8 @@ function[x, iter, resid_vec] = cgls(A, b, tol, iter_lim, precond, x)
     s = p;
     curr_tol = norm(s, 2)^2;
     stop_tol = (tol*b_nrm)^2;
-    resid_vec = [curr_tol];
-    iter = 0;
+    resid_vec = ones(iter_lim,1);
+    iter = 1;
     while curr_tol > stop_tol
         t = precond * p;
         q = A * t;
@@ -15,13 +15,14 @@ function[x, iter, resid_vec] = cgls(A, b, tol, iter_lim, precond, x)
         r = r - alpha * q;
         s = precond' * (A' * r);
         prev_tol = curr_tol;
-        resid_vec = [resid_vec, prev_tol]; %#ok<AGROW>
+        resid_vec(iter) = prev_tol;
         curr_tol = norm(s, 2)^2;
         beta = curr_tol / prev_tol;
         p = s + beta * p;
-        iter = iter + 1;
         if iter == iter_lim
             break
         end
+        iter = iter + 1;
     end
+    resid_vec = resid_vec(1:iter);
 end

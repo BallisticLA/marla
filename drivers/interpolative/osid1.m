@@ -15,12 +15,14 @@ function[Out1, Out2] = osid1(A, k, s, p, axis)
     addpath('../../comps/rangefinders/');
     if axis == 0
         % Row ID
-        Y = rf1(A, k + s, p);
+        S = rs1(A, k + s, p);
+        Y = A * S;
         % return X, Is
         [Out1, Out2] = qrcp_osid(Y, k, 0);
     elseif axis == 1
         % Column ID
-        Y = rf1(A', k+s, p);
+        S = rs1(A', k + s, p)';
+        Y = S * A;
         % return X, Is
         [Out1, Out2] = qrcp_osid(Y, k, 1);
     end

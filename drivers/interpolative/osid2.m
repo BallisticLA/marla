@@ -13,17 +13,21 @@ function[Out1, Out2] = osid2(A, k, s, p, axis)
     addpath('../../comps/rangefinders/');
     if axis == 0
         % Row ID
-        Y = rf1(A, k + s, p);
+        S = rs1(A, k + s, p);
+        Y = A * S;
         [~, ~, I] = qr(Y', 'vector');
-        Out1 = I(1 : k);
-        Out2 = A / A(Out1, :);
+        Out2 = I(1 : k);
+        Out2 = Out2(:);
+        Out1 = A / A(Out2, :);
         %return X, Is
     elseif axis == 1
         % Column ID
-        Y = rf1(A', k + s, p);
+        S = rs1(A', k + s, p)';
+        Y = S * A;
         [~, ~, J] = qr(Y, 'vector');
-        Out1 = J(1 : k);
-        Out2 = A(:, Out1) \ A; 
+        Out2 = J(1 : k);
+        Out2 = Out2(:);
+        Out1 = A(:, Out2) \ A; 
         % Return Z, Js
     end
 end

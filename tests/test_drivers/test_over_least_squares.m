@@ -1,5 +1,5 @@
 % Throws an asserion error if something went wrong.
-function [] = test_least_squares()
+function [] = test_over_least_squares()
     addpath('../matrix_generators/');
 
     % consistent_tall

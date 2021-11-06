@@ -53,19 +53,19 @@ function[] = test_fr(test1, test2)
     alg_tol = 1e-8;
 
     % Tall matrix;
-    [test1.U, test1.S, test1.V] = rand_svd(test1.A, size(test1.S_exact, 1) - 10, 0, 1, alg_tol, 5);
+    [test1.U, test1.S, test1.V] = svd1(test1.A, size(test1.S_exact, 1) - 10, 0, 1, alg_tol, 5);
     run_batch(test1, alg_tol, 1e-8);
-    [test1.U, test1.S, test1.V] = rand_svd(test1.A, size(test1.S_exact, 1) - 10, 5, 1, alg_tol, 5);
+    [test1.U, test1.S, test1.V] = svd1(test1.A, size(test1.S_exact, 1) - 10, 5, 1, alg_tol, 5);
     run_batch(test1, alg_tol, 1e-8);
-    [test1.U, test1.S, test1.V] = rand_svd(test1.A, size(test1.S_exact, 1) - 3, 5, 1, alg_tol, 5);
+    [test1.U, test1.S, test1.V] = svd1(test1.A, size(test1.S_exact, 1) - 3, 5, 1, alg_tol, 5);
     run_batch(test1, alg_tol, 1e-8);
 
     % Wide matrix
-    [test2.U, test2.S, test2.V] = rand_svd(test2.A, size(test2.S_exact, 1) - 10, 0, 1, alg_tol, 5);
+    [test2.U, test2.S, test2.V] = svd1(test2.A, size(test2.S_exact, 1) - 10, 0, 1, alg_tol, 5);
     run_batch(test2, alg_tol, 1e-8);
-    [test2.U, test2.S, test2.V] = rand_svd(test2.A, size(test2.S_exact, 1) - 10, 5, 1, alg_tol, 5);
+    [test2.U, test2.S, test2.V] = svd1(test2.A, size(test2.S_exact, 1) - 10, 5, 1, alg_tol, 5);
     run_batch(test2, alg_tol, 1e-8);
-    [test2.U, test2.S, test2.V] = rand_svd(test2.A, size(test2.S_exact, 1) - 3, 5, 1, alg_tol, 5);
+    [test2.U, test2.S, test2.V] = svd1(test2.A, size(test2.S_exact, 1) - 3, 5, 1, alg_tol, 5);
     run_batch(test2, alg_tol, 1e-8);
 
 end
@@ -75,17 +75,17 @@ function[] = test_fp_inexact(test3, test4)
     % set the relative error tolerance to 0.001
     rank = min(size(test3.A));
     rel_err = 0.001;
-    [test3.U, test3.S, test3.V] = rand_svd(test3.A, rank, 0, 1, rel_err, 5);
+    [test3.U, test3.S, test3.V] = svd1(test3.A, rank, 0, 1, rel_err, 5);
 
     run_batch(test3, rel_err, 1e-8);
-    [test3.U, test3.S, test3.V] = rand_svd(test3.A, rank, 2, 1, rel_err, 5);
+    [test3.U, test3.S, test3.V] = svd1(test3.A, rank, 2, 1, rel_err, 5);
     run_batch(test3, rel_err, 1e-8);
 
     % Wide matrix
     rank = min(size(test4.A));
-    [test4.U, test4.S, test4.V] = rand_svd(test4.A, rank, 0, 1, rel_err, 5);
+    [test4.U, test4.S, test4.V] = svd1(test4.A, rank, 0, 1, rel_err, 5);
     run_batch(test4, rel_err, 1e-8);
-    [test4.U, test4.S, test4.V] = rand_svd(test4.A, rank, 2, 1, rel_err, 5);
+    [test4.U, test4.S, test4.V] = svd1(test4.A, rank, 2, 1, rel_err, 5);
     run_batch(test4, rel_err, 1e-8);
 end
 
@@ -95,25 +95,25 @@ function[] = test_fp_exact(test1, test2, test3)
     % Tall matrix (low exact rank)
     rank = min(size(test1.A));
     rel_err = 1e-12;
-    [test1.U, test1.S, test1.V] = rand_svd(test1.A, rank, 0, 1, rel_err, 5);
+    [test1.U, test1.S, test1.V] = svd1(test1.A, rank, 0, 1, rel_err, 5);
     run_batch(test1, rel_err, 1e-8);
-    [test1.U, test1.S, test1.V] = rand_svd(test1.A, rank, 2, 1, rel_err, 5);
+    [test1.U, test1.S, test1.V] = svd1(test1.A, rank, 2, 1, rel_err, 5);
     run_batch(test1, rel_err, 1e-8);
 
     % Tall matrix (full rank)
     rank = min(size(test3.A));
-    [test3.U, test3.S, test3.V] = rand_svd(test3.A, rank, 0, 1, rel_err, 5);
+    [test3.U, test3.S, test3.V] = svd1(test3.A, rank, 0, 1, rel_err, 5);
     run_batch(test3, rel_err, 1e-8);
-    [test3.U, test3.S, test3.V] = rand_svd(test3.A, rank, 1, 1, rel_err, 5);
+    [test3.U, test3.S, test3.V] = svd1(test3.A, rank, 1, 1, rel_err, 5);
     run_batch(test3, rel_err, 1e-8);
-    [test3.U, test3.S, test3.V] = rand_svd(test3.A, rank, 2, 1, rel_err, 5);
+    [test3.U, test3.S, test3.V] = svd1(test3.A, rank, 2, 1, rel_err, 5);
     run_batch(test3, rel_err, 1e-8);
 
     % Wide matrix
     rank = min(size(test2.A));
-    [test2.U, test2.S, test2.V] = rand_svd(test2.A, rank, 0, 1, rel_err, 5);
+    [test2.U, test2.S, test2.V] = svd1(test2.A, rank, 0, 1, rel_err, 5);
     run_batch(test2, rel_err, 1e-8);
-    [test2.U, test2.S, test2.V] = rand_svd(test2.A, rank, 2, 1, rel_err, 5);
+    [test2.U, test2.S, test2.V] = svd1(test2.A, rank, 2, 1, rel_err, 5);
     run_batch(test2, rel_err, 1e-8);
 end
 

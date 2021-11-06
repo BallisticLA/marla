@@ -79,7 +79,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     end
     x_ske = R \ z_ske;
     if norm(A * x_ske - b, 'fro') >= norm(b)
-        z_ske = zeros(size(A, 2), 1);
+        z_ske = zeros(n_cols, 1);
     end
     if logging, log.t_presolve = toc; end
     
@@ -107,6 +107,6 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
         ar0 = R \ ar0;
         ar0norm = norm(ar0, 'fro');
         log.x = res;
-        log.arnorms = [ar0norm; resvec];
+        log.errors = [ar0norm; resvec];
     end
 end
