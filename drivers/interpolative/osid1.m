@@ -10,20 +10,17 @@ function[Out1, Out2] = osid1(A, k, s, p, axis)
     A ~= Out2 * (A(Out1(1 : k), :))
 %}
     % Relies on a computational routine qrcp_osid
-    % Uses rf1 as a default rangefinder, but alternatives are available. 
     addpath('../../comps/interpolative/');
     addpath('../../comps/rangefinders/');
     if axis == 0
         % Row ID
         S = rs1(A, k + s, p);
         Y = A * S;
-        % return X, Is
         [Out1, Out2] = qrcp_osid(Y, k, 0);
     elseif axis == 1
         % Column ID
         S = rs1(A', k + s, p)';
         Y = S * A;
-        % return X, Is
         [Out1, Out2] = qrcp_osid(Y, k, 1);
     end
 end

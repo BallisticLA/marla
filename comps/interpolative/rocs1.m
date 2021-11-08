@@ -16,7 +16,6 @@ function[Out] = rocs1(A, k, s, p, axis)
             end
             [~, ~, I] = qr(Y', 'vector');
             Out = I(1 : k);
-            %return Is
         elseif axis == 1
             % Column ID
             % Sketch construction stage - alternative options are available in 
@@ -34,6 +33,5 @@ function[Out] = rocs1(A, k, s, p, axis)
             end
             [~, ~, J] = la.qr(Y, 'vetcor');
             Out = J(1 : k);
-            %return Js
         end
 end

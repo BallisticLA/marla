@@ -27,11 +27,13 @@ function[Js, U, Is] = cur1(A, k, s, p)
     if size(A, 1) > size(A, 2)
         [X, Js] = osid1(A, k, s, p, 1);
         [~, ~, Is] = qr(A(:, Js)', 0);
+        Is = Is(:);  % to column vector
         Is = Is(1 : k);
         U = X / A(Is, :);
     else
         [Z, Is] = osid1(A, k, s, p, 0);
         [~, ~, Js] = qr(A(Is, :), 0);
+        Js = Js(:);  % to row vector
         Js = Js(1:k);
         U = A(:, Js) \ Z;
     end

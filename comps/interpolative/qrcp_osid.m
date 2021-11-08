@@ -1,7 +1,6 @@
 % One-sided rank-k ID of Y using QR with column pivoting
 function [Out1, Out2] = qrcp_osid(Y, k, axis) 
     if axis == 1
-        % n = size(Y,2);
         [~, R, J] = qr(Y,'vector');
         temp = [eye(k, k) R(1:k, 1:k) \ R(1:k, k + 1 : end)];
         X(:, J) = temp;

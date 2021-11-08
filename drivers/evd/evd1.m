@@ -1,5 +1,7 @@
+% This function isn't fully implemented.
 function[V, lambda_matrix] = evd1(A, k, s, p, tol, block_size)
 %{
+
     Rely on a rangefinder to obtain the matrix Q for the decomposition
     A \approx Q B. Once we have Q, we construct B = Q' * A and return
     (Q, B). This function is agnostic to the implementation of the
@@ -37,7 +39,7 @@ function[V, lambda_matrix] = evd1(A, k, s, p, tol, block_size)
         % Using a version of QB algorithm. Alternative versions may be found in
         % '../Comps/QB'. 
         addpath('../Comps/QB');
-        [Q, B] = rand_QB(A, k + s, p);
+        [Q, B] = rand_qb(A, k + s, p);
         % B = Q' * A is necessary.
         C = B * Q;
         % d = number of columns in Q, d ≤ k + s
