@@ -61,7 +61,10 @@ Algorithm 2 from YGL:2018.
     Q = zeros(m, 0, class_A);
     B = zeros(0, n, class_A);
     % Iterative stage.
-    for i = 1 : (k / block_size)
+    for i = 1 : ceil((k / block_size))
+        if size(B, 1) + block_size > k
+            block_size = k - size(B, 1);
+        end
         % Consstructiong a sketch for current iteration. 
         Omega_i = randn(n, block_size, class_A);
         [Q_i, ~] = qr((A * Omega_i) - (Q * (B * Omega_i)), 0);
