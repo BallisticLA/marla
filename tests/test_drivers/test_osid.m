@@ -75,34 +75,34 @@ function[] = test_simple_approx(test4, test5)
     % osid1
     % Tall matrices.
     [M, P] = osid1(test4.A, 27, 3, 1, 1);
-    run_osid_test(test4.A, M, P, 29, 1, 0.075);
+    run_osid_test(test4.A, M, P, 29, 1, 0.1);
     [M, P] = osid1(test4.A, 25, 4, 1, 1);
-    run_osid_test(test4.A, M, P, 28, 1, 0.075);
+    run_osid_test(test4.A, M, P, 28, 1, 0.1);
     [M, P] = osid1(test4.A, 5, 5, 1, 0);
     run_osid_test(test4.A, M, P, 3, 0, 0.1);
 
     % Wide matrices.
     [M, P] = osid1(test5.A, 27, 3, 1, 1);
-    run_osid_test(test5.A, M, P, 29, 1, 0.075);
+    run_osid_test(test5.A, M, P, 29, 1, 0.1);
     [M, P] = osid1(test5.A, 25, 4, 1, 1);
-    run_osid_test(test5.A, M, P, 28, 1, 0.075);
+    run_osid_test(test5.A, M, P, 28, 1, 0.1);
     [M, P] = osid1(test5.A, 5, 5, 1, 0);
     run_osid_test(test5.A, M, P, 3, 0, 0.1);
 
     % osid1
     % Tall matrices.
     [M, P] = osid2(test4.A, 27, 3, 1, 1);
-    run_osid_test(test4.A, M, P, 29, 1, 0.075);
+    run_osid_test(test4.A, M, P, 29, 1, 0.1);
     [M, P] = osid2(test4.A, 25, 4, 1, 1);
-    run_osid_test(test4.A, M, P, 28, 1, 0.075);
+    run_osid_test(test4.A, M, P, 28, 1, 0.1);
     [M, P] = osid2(test4.A, 5, 5, 1, 0);
     run_osid_test(test4.A, M, P, 3, 0, 0.1);
 
     % Wide matrices.
     [M, P] = osid2(test5.A, 27, 3, 1, 1);
-    run_osid_test(test5.A, M, P, 29, 1, 0.075);
+    run_osid_test(test5.A, M, P, 29, 1, 0.1);
     [M, P] = osid2(test5.A, 25, 4, 1, 1);
-    run_osid_test(test5.A, M, P, 28, 1, 0.075);
+    run_osid_test(test5.A, M, P, 28, 1, 0.1);
     [M, P] = osid2(test5.A, 5, 5, 1, 0);
     run_osid_test(test5.A, M, P, 3, 0, 0.1);
 end

@@ -1,4 +1,4 @@
-function[V, lambda_matrix] = evd2(A, k, over, num_passes)
+function[V, lambda] = evd2(A, k, over, num_passes)
 %
 %     Return a matrix V and column vector lambda that define a positive 
 %     semidefinite matrix "A_approx" through its eigen-decomposition:
@@ -51,7 +51,8 @@ function[V, lambda_matrix] = evd2(A, k, over, num_passes)
 %    '../rangefinders'.
 %
     class_A = class(A);
-    [m, n] = size(A);
+    n = size(A, 1);
+    assert(k < n);
     % By default, a Gaussian random sketching matrix is used.
     % Alternative choices are present in '../Sketching_Operators'
     Omega = randn(n, k + over, class_A);
@@ -61,28 +62,25 @@ function[V, lambda_matrix] = evd2(A, k, over, num_passes)
         [Q, ~] = qr(A' * Q, 0);
         [Q, ~] = qr(A * Q, 0);
     end
-    
-    nu = sqrt(m) * eps('double') * norm(Q, 'fro');
+    Y = A * Q;
+    nu = sqrt(n) * eps('double') * norm(Y, 'fro');
     % A temporary regularization parameter.
-    Q = Q + nu * Omega;
-    R = chol(Omega' * Q, 'lower');
-    % R is upper-triangular and R' * R = Omega' * Q = Omega' * (A + nu
-    % * I) * Omega
-    B = Q  / R';
-    B = (R \ Q')';
+    Y = Y + nu * Q;
+    R = chol(Q' * Y, 'lower');
+    B = Y  / R';
     % B has n rows and k + s columns.
-    [V, Sigma_matrix, ~] = svd(B);
+    [V, Sigma_matrix, ~] = svd(B, 'econ');
+    sigma = diag(Sigma_matrix);
     
     comp_list = [k];
-    for i = 1:min(k, n)
-        if Sigma_matrix(i+1) ^ 2 <= nu
+    for i = 1:(k-1)
+        if sigma(i+1) ^ 2 <= nu
             comp_list = [comp_list i]; %#ok<AGROW>
         end
     end
     % comp_list constracuts the union from which we drop components next.        
     r = min(comp_list); 
     % drop components that relied on regularization
-    lambda_matrix = ((Sigma_matrix(1:r)) ^ 2) - nu;
+    lambda = ((sigma(1:r)).^ 2) - nu;
     V = V(:, 1:r);
-    lambda_matrix = diag(lambda_matrix);
 end

@@ -1,4 +1,4 @@
-function [U, S, V] = svd1(A, k, s, p, tol, block_size)
+function [U, S, V] = svd1(A, k, over, p, tol, block_size)
 %{
 Return U, S, V where, for some integer ell <= k,
     U is size(A, 1)-by-ell,
@@ -16,9 +16,9 @@ k : int
     ensures ||A - U * diag(S) * V|| / ||A|| <= tol on exit. However,
     setting k=min(size(A)) may trivially return the SVD of
     A in some implementations.
-s : int
+over : int
     The randomized part of the algorithm uses k+s as the target rank;
-    we require over >= 0 and k+s <= min(size(A)).
+    we require over >= 0 and k+over <= min(size(A)).
     In a conformant implementation, that part of the algorithm will
     never return a factorization of rank greater than k+over.
     Setting over > 0 will likely result in truncating the SVD obtained
@@ -48,12 +48,12 @@ for some QB implementations.
     addpath('../comps/qb');
     [Q, B] = rand_qb_b(A, block_size, tol, k, p);
     % Using a built-in function for computing an SVD. 
-    [U, S, V] = svd(B);
+    [U, S, V] = svd(B, 'econ');
 
     % Removing singular values below machine precision. 
     cutoff = find(diag(S) < eps(class(S)), 1);
     % Removing "oversampled" data. 
-    if s > 0
+    if over > 0
         cutoff = min(k, cutoff);
     end
     if(~isempty(cutoff))
@@ -64,4 +64,5 @@ for some QB implementations.
     
     % Adjusting matrix U.
     U = Q * U;
+    %disp([norm(A - Q * B, 'fro'), norm(A - U*S*(V'), 'fro')]);
 end
