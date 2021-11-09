@@ -11,6 +11,8 @@ function [Out1, Out2] = qrcp_osid(Y, k, axis)
         [X, Is] = qrcp_osid(Y', k, 1);
         Out1 = X';
         Out2 = Is(:);  % force a column vector
+    else
+        error('Invalid axis');
     end
     %if axis == 0 
     %    % Row ID
