@@ -2,7 +2,7 @@
 
 MARLA is a Matlab library for prototyping algorithms in a future C++ library for randomized numerical linear algebra.
 The library is meant to be "LAPACK-like" and organizes its functionality into high-level "drivers" and lower-level "computational routines".
-Some of its functionality is currently untested -- this will be fixed early in the week of November 8.
+All of its driver-level functionality has at least basic tests.
 
 MARLA has a companion Python package called [PARLA](https://github.com/BallisticLA/parla).
 PARLA has an object-oriented design which is more flexible than the current implementations in MARLA.
@@ -26,3 +26,13 @@ The state of MARLA and PARLA's APIs and unit tests is summarized in [this Google
   state so that it's changed on exit, then the function should
   be modified to return a random state in addition to its usual
   return values.
+
+## Less important TODOs
+
+ * Matlab doesn't have native support for abstract linear oeprators.
+   So far this is only a minor limitation.
+   The main way that PARLA uses abstract linear operators is in 
+   a common interface for sketching operators that are only represented
+   implicitly. In Matlab it would suffice to define a special class
+   just for SRTTs. The special class would just need to overload
+   "*" (matmul) and "'" (tranpose).
