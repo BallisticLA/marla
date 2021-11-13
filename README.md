@@ -11,28 +11,25 @@ The state of MARLA and PARLA's APIs and unit tests is summarized in [this Google
 (It will be hard to read that spreadsheet without having the RandLAPACK design document on-hand.)
 
 ## Notes on tests
+* Tests are for basic correctness.
 * We're using an object-oriented testing framework for eigendecomposition
-  methods (evd1, evd2). Depending on how that goes we might modify
-  other tests to use a similar framework.
-* Low-rank approximation tests sometimes fail randomly.
-  This should only happen with tests that have an "_approx" suffix.
-  We'll fix this once we take care of the TODO below about propagating
-  random states through function calls. 
+  methods (evd1, evd2). These tests were written last. We might go
+  back and use this as an organizing principle when cleaning up other tests.
 
 ## Important TODOs
 
-* Have each function take in a random state and use it for all
-  random number generation. If it's not possible to write to the
-  state so that it's changed on exit, then the function should
-  be modified to return a random state in addition to its usual
-  return values.
+* Clean up tests.
+* Complete documentation (and revise existing documentation to follow
+  a common style).
 
 ## Less important TODOs
 
- * Matlab doesn't have native support for abstract linear oeprators.
+ * Add tests for computational routines that aren't used in downstream
+   drivers (refer to the spreadsheet for which routines those are).
+ * Matlab doesn't have native support for abstract linear operators.
    So far this is only a minor limitation.
    The main way that PARLA uses abstract linear operators is in 
    a common interface for sketching operators that are only represented
    implicitly. In Matlab it would suffice to define a special class
    just for SRTTs. The special class would just need to overload
-   "*" (matmul) and "'" (tranpose).
+   "*" (matmul) and "'" (transpose).
