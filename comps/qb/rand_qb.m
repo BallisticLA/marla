@@ -1,4 +1,4 @@
-function [Q, B] = rand_qb(A, k, p)
+function [Q, B] = rand_qb(A, k, p, s)
 %{
 Return matrices (Q, B) from a rank-k QB factorization of A.
 ----------
@@ -13,6 +13,8 @@ p : int
     Number of power iterations used. Using this algorithm version
     implies increase of the number of passes over matrix A by 2 with each
     power iteration. 
+s : int or RandomStream
+    Controls all random number generation
 Returns
 -------
 Q : matrix
@@ -41,14 +43,14 @@ Additionally, using an alternative sketching scheme from
 subspace iteration, where Zhang and Mascagni's Algorithm
 implementation requires >= 2 steps.
 %}
-    
+    s = MarlaRandStream(s);
     % Sketch construction stage - alternative options are available in 
     %'../rangefinders'.
     class_A = class(A);
     [~, n] = size(A);
     % By default, a Gaussian random sketching matrix is used.
     % Alternative choices are present in '../Sketching_Operators'
-    Omega = randn(n, k, class_A);
+    Omega = randn(s, n, k, class_A);
     [Q, ~] = qr(A * Omega, 0);
 
     for j = 1 : p

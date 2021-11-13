@@ -7,13 +7,13 @@ classdef TestEVD2 < TestEVDecomposer
         
         function [] = test_fr(obj)
             num_passes = 3;
-            alg = @(A_, k_, tol_, over_) evd2(A_, k_, over_, num_passes);
-            state = rng(0);
+            alg = @(A_, k_, tol_, over_, seed_) evd2(A_, k_, over_,...
+                num_passes, seed_);
 
+            seed = 93641;
             rank = 15;
-            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN);
-            [eth, state] = EigTestHelper.convert(U, s, obj.PSD, state);
-            rng(state);
+            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN, seed);
+            eth = EigTestHelper.convert(U, s, obj.PSD, seed);
 
             obj.run_batch(eth, alg, rank - 10, NaN, 1e-8, 0);
             obj.run_batch(eth, alg, rank - 10, NaN, 1e-8, 5);

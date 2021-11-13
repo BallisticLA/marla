@@ -1,10 +1,11 @@
-function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging)
+function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, s)
 %{
     SVD-based sketch-and-precondition for underdetermined least squares
         min ||y||
         s.t. A' y = c
     where A is tall.
 %}
+        s = MarlaRandStream(s);
         if logging == 0
             %disp('Optional parameter for logging detailed information has not been passed.'); 
         end
@@ -17,7 +18,7 @@ function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging)
         % By default, a SJLT sketching matrix is used.
         % Alternative choices are present in '../../Utils/Sketching_Operators'.
         addpath('../../utils/sketching_operators');
-        Omega = sjlt(double(d), double(n_rows), double(8));
+        Omega = sjlt(double(d), double(n_rows), double(8), s);
         A_ske = Omega * A;
         if logging, log.t_sketch = toc; end
 
@@ -33,7 +34,7 @@ function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging)
         if logging, tic, end
         addpath('../../comps/itersaddle/');
         % Iterative solver - needs implementation.
-        [x, y, resid_vec] = pcg(A, zeros(n_rows, 1), c, 0.0,...
+        [~, y, resid_vec] = pcg(A, zeros(n_rows, 1), c, 0.0,...
             tol, iter_lim, M, zeros(n_cols,1));
         if logging, log.t_iterate = toc; end 
 

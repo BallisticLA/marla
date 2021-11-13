@@ -1,4 +1,4 @@
-function[V, lambda] = evd1(A, k, tol, over, num_passes, block_size)
+function[V, lambda] = evd1(A, k, tol, over, num_passes, block_size, s)
 % 
 %     Return a matrix V and column vector lambda that define a symmetric matrix
 %     "A_approx" through its eigen-decomposition:
@@ -54,8 +54,9 @@ function[V, lambda] = evd1(A, k, tol, over, num_passes, block_size)
 %    Using a version of QB algorithm. Alternative versions may be found in
 %    '../comps/qb'. 
 %
+    s = MarlaRandStream(s);
     addpath('../comps/qb');
-    [Q, B] = rand_qb_b(A, block_size, tol / 2, k + over, num_passes);
+    [Q, B] = rand_qb_b(A, block_size, tol / 2, k + over, num_passes, s);
     % B = Q' * A is necessary.
     C = B * Q;
     % d = number of columns in Q, d ≤ k + over

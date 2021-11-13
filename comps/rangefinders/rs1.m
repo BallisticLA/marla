@@ -1,4 +1,4 @@
-function [Q] = rs1(A, k, p)
+function [Q] = rs1(A, k, p, s)
     %{
     Pass-Efficient routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 
@@ -6,6 +6,8 @@ function [Q] = rs1(A, k, p)
 
     Uses power iteration technique (recommended for cases with slow decay 
     of singular values of A), controlled by parameter p.
+
+    s is an int or RandomStream. It controls all random number generation.
 
     Uses QR decomposition for insuring orthogonality of the columns of
     sketch Q.
@@ -21,7 +23,7 @@ function [Q] = rs1(A, k, p)
     if(mod(v, 2) == 0)
         % By default, a Gaussian random sketching matrix is used.
         % Alternative choices are present in '../Sketching_Operators'
-        Omega = randn(m, k, class_A);
+        Omega = randn(s, m, k, class_A);
         
         if (v > 2)
             [Q, ~] = lu(A' * Omega);
@@ -33,7 +35,7 @@ function [Q] = rs1(A, k, p)
         % By default, a Gaussian random sketching matrix is used.
         % Alternative choices are present in
         % '../../utils/sketching_operators'.
-        Q = randn(n, k, class_A);
+        Q = randn(s, n, k, class_A);
         if p == 0
             [Q, ~] = qr(A * Q, 0);
         end

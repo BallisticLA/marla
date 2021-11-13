@@ -1,7 +1,9 @@
-function [Q, B] = rand_qb_sp(A, k)
+function [Q, B] = rand_qb_sp(A, k, s)
 %{
 "Single-pass" version of QB algorithm.
 Return matrices (Q, B) from a rank-k QB factorization of A.
+
+Parameters
 ----------
 A : matrix
     Data matrix to approximate.
@@ -10,6 +12,9 @@ k : int
     This parameter includes any oversampling. For example, if you
     want to be near the optimal (Eckhart-Young) error for a rank 20
     approximation of A, then you might want to set k=25.
+s : int or RandomStream
+    Controls all random number generation
+
 Returns
 -------
 Q : matrix
@@ -25,11 +30,12 @@ References
 Initial idea stated in section 5.5 of  Halko, Nathan, Per-Gunnar
 Martinsson, and Joel A. Tropp's paper. Further developed in YGL:2018.
 %}
+    s = MarlaRandStream(s);
     class_A = class(A);
     [m, n] = size(A);
     % Sketch construction stage - two sketches are constructed here. 
-    Omega = randn(n, k, class_A);
-    Omega_ = randn(m, k, class_A);
+    Omega = randn(s, n, k, class_A);
+    Omega_ = randn(s, m, k, class_A);
     Y = A * Omega;
     Y_ = A' * Omega_;
     [Q, ~] = qr(Y, 0);

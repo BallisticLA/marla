@@ -1,4 +1,4 @@
-function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, logging)
+function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, logging, s)
     %{
     A sketch-and-precondition approach to overdetermined ordinary least
     squares. This implementation uses QR (when use_chol=false) or Cholesky
@@ -42,6 +42,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
     %}
+    s = MarlaRandStream(s);
     if ~logging
         %disp('Optional parameter for logging detailed information has not been passed.'); 
     end
@@ -54,7 +55,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
     addpath('../../Utils/Sketching_Operators')
-    Omega = sjlt(double(d), double(num_rows), double(8));
+    Omega = sjlt(double(d), double(num_rows), double(8), s);
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
     

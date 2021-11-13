@@ -1,4 +1,4 @@
-function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, logging) 
+function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, logging, s) 
     %{
     A sketch-and-precondition approach to overdetermined ordinary least
     squares. This implementation uses the SVD to obtain the preconditioner
@@ -26,6 +26,7 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
     %}
+    s = MarlaRandStream(s);
     if logging == 0
         %disp('Optional parameter for logging detailed information has not been passed.'); 
     end
@@ -38,7 +39,7 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
     addpath('../../Utils/Sketching_Operators')
-    Omega = sjlt(d, num_rows, 8);
+    Omega = sjlt(d, num_rows, 8, s);
     A_ske = Omega * A;
     if logging, log.t_sketch = toc; end
     

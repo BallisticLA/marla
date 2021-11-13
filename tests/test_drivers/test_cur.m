@@ -5,41 +5,42 @@ end
 
 
 function [] = test_simple_exact()
+    seed = 654;
     p = 1;
-    alg = @(A_, k_, s_) cur1(A_, k_, s_, p);
+    alg = @(A_, k_, s_, seed_) cur1(A_, k_, s_, p, seed_);
 
     m = 100;
     n = 30;
-    run_cur_test(alg, m, n, 24, 25, 3, 1e-12, 0);
-    run_cur_test(alg, n, m, 24, 25, 3, 1e-12, 0);
+    run_cur_test(alg, m, n, 24, 25, 3, 1e-12, seed);
+    run_cur_test(alg, n, m, 24, 25, 3, 1e-12, seed);
 
-    run_cur_test(alg, m, n, 5, 5, 1, 1e-12, 2);
-    run_cur_test(alg, n, m, 5, 5, 1, 1e-12, 2);
+    run_cur_test(alg, m, n, 5, 5, 1, 1e-12, seed);
+    run_cur_test(alg, n, m, 5, 5, 1, 1e-12, seed);
 
 end
 
 
 function [] = test_simple_approx()
+    seed = 192;
     p = 1;
-    alg = @(A_, k_, s_) cur1(A_, k_, s_, p);
+    alg = @(A_, k_, s_, seed_) cur1(A_, k_, s_, p, seed_);
 
     m = 100;
     n = 30;
-    run_cur_test(alg, m, n, 30, 27, 3, 1e-1, 0);
-    run_cur_test(alg, n, m, 30, 27, 3, 1e-1, 0);
+    run_cur_test(alg, m, n, 30, 27, 3, 1e-1, seed);
+    run_cur_test(alg, n, m, 30, 27, 3, 1e-1, seed);
 
-    run_cur_test(alg, m, n, 30, 25, 4, 1e-1, 0);
-    run_cur_test(alg, n, m, 30, 25, 4, 1e-1, 0);
+    run_cur_test(alg, m, n, 30, 25, 4, 1e-1, seed);
+    run_cur_test(alg, n, m, 30, 25, 4, 1e-1, seed);
 
-    run_cur_test(alg, m, n, 30, 5, 5, 3e-1, 0);
-    run_cur_test(alg, n, m, 30, 5, 5, 3e-1, 0);    
+    run_cur_test(alg, m, n, 30, 5, 5, 3e-1, seed);
+    run_cur_test(alg, n, m, 30, 5, 5, 3e-1, seed);    
 end
 
 
 function [] = run_cur_test(alg, m, n, rank, k, over, test_tol, seed)
-    rng(seed);
-    A = gen_test_mat(m, n, rank, NaN);
-    [Js, U, Is] = alg(A, k, over);
+    A = gen_test_mat(m, n, rank, NaN, seed);
+    [Js, U, Is] = alg(A, k, over, seed);
     A_id = A(:, Js) * U * A(Is, :);
 
     err_rand = norm(A - A_id, 'fro');

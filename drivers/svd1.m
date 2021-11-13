@@ -1,4 +1,4 @@
-function [U, S, V] = svd1(A, k, over, p, tol, block_size)
+function [U, S, V] = svd1(A, k, over, p, tol, block_size, s)
 %{
 Return U, S, V where, for some integer ell <= k,
     U is size(A, 1)-by-ell,
@@ -38,15 +38,17 @@ block_size : int
     The block size for a blocked QB algorithm. Add this many columns
     to Q at each iteration (except possibly the final iteration).
     dependent.
+s : int or RandomStream
 
 This implementation of rand_SVD uses versions of QB algorithm as its main 
 computational routine. Tolerance and block size parameters are not required 
 for some QB implementations.
 %}
+    s = MarlaRandStream(s);
     % Using a version of QB algorithm. Alternative versions may be found in
     % '../comps/qb'. 
     addpath('../comps/qb');
-    [Q, B] = rand_qb_b(A, block_size, tol, k, p);
+    [Q, B] = rand_qb_b(A, block_size, tol, k, p, s);
     % Using a built-in function for computing an SVD. 
     [U, S, V] = svd(B, 'econ');
 

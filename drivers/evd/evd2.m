@@ -1,4 +1,4 @@
-function[V, lambda] = evd2(A, k, over, num_passes)
+function[V, lambda] = evd2(A, k, over, num_passes, s)
 %
 %     Return a matrix V and column vector lambda that define a positive 
 %     semidefinite matrix "A_approx" through its eigen-decomposition:
@@ -50,12 +50,13 @@ function[V, lambda] = evd2(A, k, over, num_passes)
 %    Sketch construction stage - alternative options are available in 
 %    '../rangefinders'.
 %
+    s = MarlaRandStream(s);
     class_A = class(A);
     n = size(A, 1);
     assert(k < n);
     % By default, a Gaussian random sketching matrix is used.
     % Alternative choices are present in '../Sketching_Operators'
-    Omega = randn(n, k + over, class_A);
+    Omega = randn(s, n, k + over, class_A);
     [Q, ~] = qr(A * Omega, 0);
     
     for j = 1 : num_passes

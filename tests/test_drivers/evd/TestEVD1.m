@@ -8,14 +8,13 @@ classdef TestEVD1 < TestEVDecomposer
         function [] = test_fr(obj)
             num_passes = 3;
             block_size = 2;
-            alg = @(A_, k_, tol_, over_) evd1(A_, k_, tol_, over_,...
-                num_passes, block_size);
-            state = rng(0);
+            alg = @(A_, k_, tol_, over_, seed_) evd1(A_, k_, tol_, over_,...
+                num_passes, block_size, seed_);
 
             rank = 15;
-            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN);
-            [eth, state] = EigTestHelper.convert(U, s, obj.PSD, state);
-            rng(state);
+            seed = 7;
+            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN, seed);
+            eth = EigTestHelper.convert(U, s, obj.PSD, seed);
 
             obj.run_batch(eth, alg, rank - 10, NaN, 1e-8, 0);
             obj.run_batch(eth, alg, rank - 10, NaN, 1e-8, 5);
@@ -25,14 +24,14 @@ classdef TestEVD1 < TestEVDecomposer
         function [] = test_fp_inexact(obj)
             num_passes = 2;
             block_size = 2;
-            alg = @(A_, k_, tol_, over_) evd1(A_, k_, tol_, over_,...
-                num_passes, block_size);
-            state = rng(0);
+            alg = @(A_, k_, tol_, over_, seed_) evd1(A_, k_, tol_,...
+                over_, num_passes, block_size, seed_);
+            seed = 0;
 
             rank = 15;
-            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN);
-            [eth, state] = EigTestHelper.convert(U, s, obj.PSD, state);
-            rng(state);
+            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN, seed);
+            eth = EigTestHelper.convert(U, s, obj.PSD, seed);
+
             % TODO: update tests so we can verify returned matrix
             % has a reasonably low rank.
             rel_err = 0.25;
@@ -44,14 +43,13 @@ classdef TestEVD1 < TestEVDecomposer
         function [] = test_fp_exact(obj)
             num_passes = 2;
             block_size = 2;
-            alg = @(A_, k_, tol_, over_) evd1(A_, k_, tol_, over_,...
-                num_passes, block_size);
-            state = rng(0);
+            alg = @(A_, k_, tol_, over_, seed_) evd1(A_, k_, tol_,...
+                over_, num_passes, block_size, seed_);
+            seed = 0;
 
             rank = 15;
-            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN);
-            [eth, state] = EigTestHelper.convert(U, s, obj.PSD, state);
-            rng(state);
+            [U, s, ~] = gen_test_mat_factors(200, 50, rank, NaN, seed);
+            eth = EigTestHelper.convert(U, s, obj.PSD, seed);
 
             rel_err = 1e-12;
             obj.run_batch(eth, alg, rank, rel_err, 1e-8, 0);

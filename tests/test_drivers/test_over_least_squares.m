@@ -1,11 +1,13 @@
 % Throws an asserion error if something went wrong.
 function [] = test_over_least_squares()
     addpath('../matrix_generators/');
-
+    seed = 98743;
+    stream = MarlaRandStream(seed);
+        
     % consistent_tall
     m = 100;
     n = 10;
-    A = gen_simp_mat(m, n, 1);
+    A = gen_simp_mat(m, n, 1, stream);
     [U, s, Vt] = svd(A);
     x = randn(n, 1);
     test1.A = A;
@@ -16,17 +18,18 @@ function [] = test_over_least_squares()
     test1.b = A * x;
 
     % consistent_lowrank
+    stream = MarlaRandStream(seed);
     m = 100;
     n = 10;
     rank = 5;
-    U = randn(m, rank);
+    U = randn(stream, m, rank);
     [U,~] = qr(U, 0);
-    s = diag(rand(rank, 1) + 1e-4);
-    V = randn(n, rank);
+    s = diag(rand(stream, rank, 1) + 1e-4);
+    V = randn(stream, n, rank);
     [V,~] = qr(V, 0);
     Vt = V';
     A = (U * s) * Vt;
-    x = randn(n, 1);
+    x = randn(stream, n, 1);
     test2.A = A;
     test2.U = U;
     test2.s = s;
@@ -35,15 +38,16 @@ function [] = test_over_least_squares()
     test2.b = A * x;
    
     % consistent_square
+    stream = MarlaRandStream(seed);
     n = 10;
-    s = diag(rand(n, 1) + 1e-4);
-    U = randn(m, n);
+    s = diag(rand(stream, n, 1) + 1e-4);
+    U = randn(stream, m, n);
     [U,~] = qr(U, 0);
-    V = randn(n, n);
+    V = randn(stream, n, n);
     [V, ~] = qr(V, 0);
     Vt = V'; 
     A = (U * s) * Vt;
-    x = randn(n, 1);
+    x = randn(stream, n, 1);
     test3.A = A;
     test3.U = U;
     test3.s = s;
@@ -52,16 +56,17 @@ function [] = test_over_least_squares()
     test3.b = A * x;    
 
     % inconsistent_orthog
+    stream = MarlaRandStream(seed);
     m = 1000;
     n = 100;
-    U = randn(m, n);
+    U = randn(stream, m, n);
     [U,~] = qr(U, 0);
-    V = randn(n, n);
+    V = randn(stream, n, n);
     [V, ~] = qr(V, 0);
     Vt = V'; 
-    s = diag(rand(n, 1) + 1e-4);
+    s = diag(rand(stream, n, 1) + 1e-4);
     A = U * s * Vt;
-    b = randn(m, 1);
+    b = randn(stream, m, 1);
     b = b - U * (U' * b);
     test4.A = A;
     test4.U = U;
@@ -71,6 +76,7 @@ function [] = test_over_least_squares()
     test4.x_opt = zeros(n, 1); 
     
     % inconsistent_gen
+    stream = MarlaRandStream(seed);
     m = 1000;
     n = 100;
     num_hi = 30;
@@ -79,17 +85,17 @@ function [] = test_over_least_squares()
     hi_spec = 1e5 * ones(1, num_hi) + rand(1, num_hi);
     lo_spec = ones(1, num_lo) + rand(1, num_lo);
     spec = diag(cat(2, hi_spec, lo_spec));
-    U = randn(m, n);
+    U = randn(stream, m, n);
     [U,~] = qr(U, 0);
-    V = randn(n, n);
+    V = randn(stream, n, n);
     [V,~] = qr(V, 0);
     Vt = V';
     A = (U * spec) * Vt;
     % Make b
-    hi_x = randn(num_hi, 1) / 1e5;
-    lo_x = randn(num_lo, 1);
+    hi_x = randn(stream, num_hi, 1) / 1e5;
+    lo_x = randn(stream, num_lo, 1);
     x = cat(1, hi_x, lo_x);
-    b_orth = randn(m, 1) * 1e2;
+    b_orth = randn(stream, m, 1) * 1e2;
     % orthogonal to range(A)
     b_orth = b_orth - U * (U' * b_orth);
     test5.A = A;
@@ -105,73 +111,75 @@ end
 
 function[] = test_spo3(test1, test3, test4, test5)
     addpath('../../drivers/least_squares/');
+    seed = 0;
 
-        % consistent_tall, QR
-        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, false,  0);
-        run_consistent(test1, 1e-12);
+    % consistent_tall, QR
+    test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, false,  0, seed);
+    run_consistent(test1, 1e-12);
 
-        % consistent_square, QR
-        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, false, 0);
-        run_consistent(test3, 1e-12);
+    % consistent_square, QR
+    test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, false, 0, seed);
+    run_consistent(test3, 1e-12);
 
-        % inconsistent_orthog, QR
-        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, false, 0);
-        run_inconsistent(test4, 1e-6);
+    % inconsistent_orthog, QR
+    test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, false, 0, seed);
+    run_inconsistent(test4, 1e-6);
 
-        % inconsistent_gen, QR
-        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, false, 0);
-        run_inconsistent(test5, 1e-6);
-        
-        
-        % consistent_tall, QR
-        test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, true,  0);
-        run_consistent(test1, 1e-12);
+    % inconsistent_gen, QR
+    test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, false, 0, seed);
+    run_inconsistent(test5, 1e-6);
+    
+    
+    % consistent_tall, QR
+    test1.x_approx = spo3(test1.A, test1.b, 1, 0.0, 1, true,  0, seed);
+    run_consistent(test1, 1e-12);
 
-        % consistent_square, QR
-        test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, true, 0);
-        run_consistent(test3, 1e-12);
+    % consistent_square, QR
+    test3.x_approx = spo3(test3.A, test3.b, 1, 0.0, 1, true, 0, seed);
+    run_consistent(test3, 1e-12);
 
-        % inconsistent_orthog, QR
-        test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, true, 0);
-        run_inconsistent(test4, 1e-6);
+    % inconsistent_orthog, QR
+    test4.x_approx = spo3(test4.A, test4.b, 3, 1e-12, 100, true, 0, seed);
+    run_inconsistent(test4, 1e-6);
 
-        % inconsistent_gen, QR
-        test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, true, 0);
-        run_inconsistent(test5, 1e-6);
+    % inconsistent_gen, QR
+    test5.x_approx = spo3(test5.A, test5.b, 3, 1e-12, 100, true, 0, seed);
+    run_inconsistent(test5, 1e-6);
 end
 
 function[] = test_spo1(test1, test2, test3, test4, test5)
     addpath('../../drivers/least_squares/');
+    seed = 2;
 
-        % consistent_tall()
-        test1.x_approx = spo1(test1.A, test1.b, 3, 1e-12, 100, 0, 0);
-        run_consistent(test1, 1e-6)
-        test1.x_approx = spo1(test1.A, test1.b, 1, 0.0, 1, 1, 0);
-        run_consistent(test1, 1e-12);
+    % consistent_tall()
+    test1.x_approx = spo1(test1.A, test1.b, 3, 1e-12, 100, 0, 0, seed);
+    run_consistent(test1, 1e-6)
+    test1.x_approx = spo1(test1.A, test1.b, 1, 0.0, 1, 1, 0, seed);
+    run_consistent(test1, 1e-12);
 
-        % consistent_lowrank
-        test2.x_approx = spo1(test2.A, test2.b, 3, 0.0, 100, 0, 0);
-        run_consistent(test2, 1e-6);
-        test2.x_approx = spo1(test2.A, test2.b, 1, 0.0, 1, 1, 0);
-        run_consistent(test2, 1e-12);
+    % consistent_lowrank
+    test2.x_approx = spo1(test2.A, test2.b, 3, 0.0, 100, 0, 0, seed);
+    run_consistent(test2, 1e-6);
+    test2.x_approx = spo1(test2.A, test2.b, 1, 0.0, 1, 1, 0, seed);
+    run_consistent(test2, 1e-12);
 
-        % consistent_square
-        test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 100, 0, 0);
-        run_consistent(test3, 1e-6);
-        test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 1, 1, 0);
-        run_consistent(test3, 1e-12)
+    % consistent_square
+    test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 100, 0, 0, seed);
+    run_consistent(test3, 1e-6);
+    test3.x_approx = spo1(test3.A, test3.b, 1, 0.0, 1, 1, 0, seed);
+    run_consistent(test3, 1e-12)
 
-        % inconsistent_orthog
-        test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 0, 0);
-        run_inconsistent(test4, 1e-6);
-        test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 1, 0);
-        run_inconsistent(test4, 1e-6);
+    % inconsistent_orthog
+    test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 0, 0, seed);
+    run_inconsistent(test4, 1e-6);
+    test4.x_approx = spo1(test4.A, test4.b, 3, 1e-12, 100, 1, 0, seed);
+    run_inconsistent(test4, 1e-6);
 
-        % inconsistent_gen
-        test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 100, 0, 0);
-        run_inconsistent(test5, 1e-6);
-        test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 50, 1, 0);
-        run_inconsistent(test5, 1e-6);
+    % inconsistent_gen
+    test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 100, 0, 0, seed);
+    run_inconsistent(test5, 1e-6);
+    test5.x_approx = spo1(test5.A, test5.b, 3, 1e-12, 50, 1, 0, seed);
+    run_inconsistent(test5, 1e-6);
 end
 
 function[] = run_inconsistent(self, test_tol)

@@ -67,19 +67,18 @@ classdef EigTestHelper
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     methods(Static)
-        function [eth, state] = convert(U, s, psd, state)
-            rng(state);
+        function eth = convert(U, spectrum, psd, s)
             if psd
-                lamb = s;
+                lamb = spectrum;
             else
-                flips = rand(size(s)) < 0.5;
-                signs = ones(size(s));
+                s = MarlaRandStream(s);
+                flips = rand(s, size(spectrum)) < 0.5;
+                signs = ones(size(spectrum));
                 signs(flips) = -1;
-                lamb = s .* signs;
+                lamb = spectrum .* signs;
             end
             A = U * diag(lamb) * U';
             eth = EigTestHelper(A, U, lamb);
-            state = rng;
         end
     end
 end

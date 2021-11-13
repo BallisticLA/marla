@@ -1,4 +1,4 @@
-function [Q, B] = rand_qb_b_pe(A, block_size, tol, k, p)
+function [Q, B] = rand_qb_b_pe(A, block_size, tol, k, p, s)
 %{
 Iteratively build an approximate QB factorization of A,
 which terminates once one of the following conditions
@@ -31,6 +31,9 @@ p : int
     Number of power iterations used. Using this algorithm version
     implies increase of the number of passes over matrix A by 2 with each
     power iteration. 
+s : int or RandomStream
+    Controls all random number generation
+
 Returns
 -------
 Q : matrix
@@ -41,6 +44,7 @@ References
 ----------
 This implements a variant of [YGL:2018, Algorithm 4].
 %}
+    s = MarlaRandStream(s);
     norm_A = norm(A, 'fro');
     % Early termination check on an empty input. 
     if norm_A == 0
@@ -53,7 +57,7 @@ This implements a variant of [YGL:2018, Algorithm 4].
     [m, n] = size(A);
     norm_B = 0;
     % Sketch construction stage.
-    Omega = randn(n, k, class_A);
+    Omega = randn(s, n, k, class_A);
     for  j = 1 : p
         [G, ~] = qr(A * Omega, 0);
         [Omega, ~] = qr(A' * G, 0);

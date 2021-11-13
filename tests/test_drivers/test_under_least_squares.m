@@ -1,5 +1,6 @@
 % Throws an asserion error if something went wrong.
 function [] = test_under_least_squares()
+    seed0 = 3893874;
     addpath('../matrix_generators/');
 
     % linspace_spec
@@ -7,10 +8,11 @@ function [] = test_under_least_squares()
     n = 100;
     cond_num = 1e5;
     spectrum = linspace(cond_num^0.5, cond_num^(-0.5), n);
-    A = gen_test_mat(m, n, n, spectrum);
+    seed = MarlaRandStream(seed0);
+    A = gen_test_mat(m, n, n, spectrum, seed);
     test1.A = A;
     test1.s = spectrum;
-    y0 = randn(m,1);
+    y0 = randn(seed, m, 1);
     test1.c = A' * y0;
     test1.y_opt = A' \ test1.c;
     
@@ -20,10 +22,11 @@ function [] = test_under_least_squares()
     n = 100;
     cond_num = 1e5;
     spectrum = logspace(log10(cond_num)/2, -log10(cond_num)/2, n);
-    A = gen_test_mat(m, n, n, spectrum);
+    seed = MarlaRandStream(seed0);
+    A = gen_test_mat(m, n, n, spectrum, seed);
     test2.A = A;
     test2.s = spectrum;
-    y0 = randn(m,1);
+    y0 = randn(seed, m, 1);
     test2.c = A' * y0;
     test2.y_opt = A' \ test2.c;
    
@@ -33,10 +36,11 @@ function [] = test_under_least_squares()
     cond_num = 1e5;
     rk = 80;
     spectrum = linspace(cond_num^0.5, cond_num^(-0.5), rk);
-    A = gen_test_mat(m, n, rk, spectrum);
+    seed = MarlaRandStream(seed0);
+    A = gen_test_mat(m, n, rk, spectrum, seed);
     test3.A = A;
     test3.s = spectrum;
-    y0 = randn(m,1);
+    y0 = randn(seed, m,1);
     test3.c = A' * y0;
     test3.y_opt = A' \ test3.c;
     
@@ -47,17 +51,18 @@ end
 
 function[] = test_spu1(test1, test2, test3)
     addpath('../../drivers/least_squares/');
-
+    seed = 998765;
+        
     % linspace spec
-    test1.y_approx = spu1(test1.A, test1.c, 3, 1e-12, 50, 0);
+    test1.y_approx = spu1(test1.A, test1.c, 3, 1e-12, 50, 0, seed);
     run_test(test1, 1e-6)
 
     % logspace spec
-    test2.y_approx = spu1(test2.A, test2.c, 3, 1e-12, 50, 0);
+    test2.y_approx = spu1(test2.A, test2.c, 3, 1e-12, 50, 0, seed);
     run_test(test2, 1e-6);
 
     % lowrank linspace spec
-    test3.y_approx = spu1(test3.A, test3.c, 3, 1e-12, 50, 0);
+    test3.y_approx = spu1(test3.A, test3.c, 3, 1e-12, 50, 0, seed);
     run_test(test3, 1e-6);
 end
 

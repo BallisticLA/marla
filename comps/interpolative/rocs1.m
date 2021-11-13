@@ -1,5 +1,6 @@
-function[Out] = rocs1(A, k, s, p, axis)
+function[Out] = rocs1(A, k, over, p, axis, s)
         if axis == 0
+            s = MarlaRandStream(s);
             % Row ID
             % Sketch construction stage - alternative options are available in 
             %'../rangefinders'.
@@ -7,7 +8,7 @@ function[Out] = rocs1(A, k, s, p, axis)
             [~, n] = size(A);
             % By default, a Gaussian random sketching matrix is used.
             % Alternative choices are present in '../../utils/sketching_operators'.
-            Omega = randn(n, k + s, class_A);
+            Omega = randn(s, n, k + over, class_A);
             [Y, ~] = qr(A * Omega, 0);    
             disp(size(Y));
             for j = 1 : p
@@ -25,7 +26,7 @@ function[Out] = rocs1(A, k, s, p, axis)
             [m, ~] = size(A);
             % By default, a Gaussian random sketching matrix is used.
             % Alternative choices are present in '../../utils/sketching_operators'.
-            Omega = randn(m, k + s, class_A);
+            Omega = randn(s, m, k + over, class_A);
             [Y, ~] = qr(A' * Omega, 0);    
             for j = 1 : p
                 [Y, ~] = qr(A * Y, 0);

@@ -23,13 +23,11 @@ classdef TestEVDecomposer
             % eth: EigTestHelper
             % revd: (partial) function handle for evd1 or evd2
             for idx = 1:length(obj.SEEDS)
-                % Seed test seed
                 seed = obj.SEEDS(idx);
-                rng(seed);
 
                 % Call the algorithm
                 [V_approx, lamb_approx] = revd(eth.A,...
-                    target_rank, target_tol, over);
+                    target_rank, target_tol, over, seed);
                 eth.V_approx = V_approx;
                 eth.lamb_approx = lamb_approx;
                 
