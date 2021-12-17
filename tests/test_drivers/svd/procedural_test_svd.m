@@ -13,7 +13,7 @@
     
     To investigate.
 %}
-function [] = test_svd()
+function [] = procedural_test_svd()
     addpath('../matrix_generators/');
     seed = 59;
 

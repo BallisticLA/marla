@@ -1,4 +1,4 @@
-function [Q] = rs1(A, k, p, s)
+function [Q, log] = rs1(A, k, p, s, logging)
     %{
     Pass-Efficient routine for constructing a matrix Q of size 
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 
@@ -15,10 +15,18 @@ function [Q] = rs1(A, k, p, s)
     Allows for any number of passes over the initial matrix A.
     Uses LU factorization for stabilization during power iterations step. 
     %}
+    if logging.depth == 0 || logging.span == 0
+        log_present = 0;
+        %disp('Optional parameter for logging detailed information has not been passed.'); 
+    else
+        log_present = 1;
+    end
+
     class_A = class(A);
     [m, n] = size(A);
     v = 2 * p + 1;
-
+    
+    if log_present, tic, end
     % Odd number of passes over A.
     if(mod(v, 2) == 0)
         % By default, a Gaussian random sketching matrix is used.
@@ -40,9 +48,10 @@ function [Q] = rs1(A, k, p, s)
             [Q, ~] = qr(A * Q, 0);
         end
     end
+    if log_present, log.t_sketch = toc; end
 
+    if log_present, tic, end
     for i = 1 : p
-
         [Q, ~] = lu(A * Q);
         if i == p
             [Q, ~] = qr(A' * Q, 0);
@@ -50,4 +59,5 @@ function [Q] = rs1(A, k, p, s)
             [Q, ~] = lu(A' * Q);
         end
     end
+    if log_present, log.t_power_iter = toc; end
 end
