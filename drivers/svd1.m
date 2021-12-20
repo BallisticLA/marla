@@ -54,6 +54,21 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
         Span - describes which types of info should be logged (0 for none,
         1 for timings, 2 for timings + errors estimates, 3 for unusual 
         behaviors).
+
+     Returns
+     -------
+     U : matrix
+         Orthonormal
+ 
+     S : matrix
+         Diagonal matrix of singular values
+
+     V : matrix
+         Orthonormal
+
+     log : structure array
+         Holds fields with logged information on routine - fields depend on
+         subroutines used.
     
     This implementation of rand_SVD uses versions of QB algorithm as its main 
     computational routine. Tolerance and block size parameters are not required 
@@ -66,7 +81,7 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
 %}
     if logging.depth == 0 || logging.span == 0
         log_present = 0;
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+        log.status = 'Optional parameter for logging detailed information has not been passed.'; 
     else
         log_present = 1;
         logging.depth = logging.depth - 1;

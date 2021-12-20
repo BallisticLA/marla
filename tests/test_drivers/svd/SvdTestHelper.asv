@@ -70,15 +70,16 @@ classdef SvdTestHelper
             Vt = (self.V_approx)';
 
 
-            %logging.depth = 0;
-            %logging.span = 0;
-            %[U1, S1, V1, ~] = svd1(A, 13, 1e-8, 0, 0, 2, 99, logging);
-            %disp(norm(A - (U1 * S1 * V1'), 'fro'));
+            logging.depth = 0;
+            logging.span = 0;
+            [U1, S1, V1, ~] = svd1(A, 13, 1e-8, 0, 0, 2, 99, logging);
+            disp(norm(A - (U1 * S1 * V1'), 'fro'));
+
 
             % TODO: change this to relative tolerance
             delta = A - (U * s * Vt);
             nrm = norm(delta, 'fro');
-            %disp(nrm)
+            disp(nrm)
             % abs_tol = rel_tol * norm(S, 2)
             % ^ Scale by  Frobenius norm of A.
             % assert(nrm <= rel_tol)

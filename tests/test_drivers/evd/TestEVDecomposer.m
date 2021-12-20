@@ -18,7 +18,7 @@ classdef TestEVDecomposer
         end
 
         function [] = run_batch(obj, eth, revd, target_rank,...
-                target_tol, test_tol, over)
+                target_tol, test_tol, over, logging)
             % obj: TestEVDecomposer
             % eth: EigTestHelper
             % revd: (partial) function handle for evd1 or evd2
@@ -26,8 +26,8 @@ classdef TestEVDecomposer
                 seed = obj.SEEDS(idx);
 
                 % Call the algorithm
-                [V_approx, lamb_approx] = revd(eth.A,...
-                    target_rank, target_tol, over, seed);
+                [V_approx, lamb_approx, ~] = revd(eth.A,...
+                    target_rank, target_tol, over, seed, logging);
                 eth.V_approx = V_approx;
                 eth.lamb_approx = lamb_approx;
                 

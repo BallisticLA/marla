@@ -1,5 +1,8 @@
 %{
     NOTE:
+    Not consistent with the current algorithm version - use only as a
+    reference.
+
     Set relative error instead of absolute error due to the way rand_QB
     operates. 
 

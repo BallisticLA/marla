@@ -67,7 +67,7 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
 %}
     if logging.depth == 0 || logging.span == 0
         log_present = 0;
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+        log.status = 'Optional parameter for logging detailed information has not been passed.';  
     else
         log_present = 1;
         logging.depth = logging.depth - 1;
@@ -113,7 +113,7 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
     % drop components that relied on regularization
     lambda = ((sigma(1:r)).^ 2) - nu;
     V = V(:, 1:r);
-    if logging, log.t_main = toc; end
+    if log_present, log.t_main = toc; end
 
     % Relative error computation
     if logging.span >= 2 && log_present

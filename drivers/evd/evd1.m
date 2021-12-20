@@ -64,8 +64,6 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
  
     Notes 
     -----
-    Using a version of QB algorithm. Alternative versions may be found in
-    '../comps/qb'. 
     Before calling this routine, use:
     addpath('../utils') - for MatrlaRandStream.m
     addpath('../comps/qb') - for different versions of QB algorithm.
@@ -73,7 +71,7 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
       
     if logging.depth == 0 || logging.span == 0
         log_present = 0;
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+        log.status = 'Optional parameter for logging detailed information has not been passed.'; 
     else
         log_present = 1;
         logging.depth = logging.depth - 1;

@@ -71,7 +71,7 @@ function [Q, B, log] = rand_qb(A, k, p, s, logging)
 
     if logging.depth == 0 || logging.span == 0
         log_present = 0;
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+        log.status = 'Optional parameter for logging detailed information has not been passed.'; 
     else
         log_present = 1;
         logging.depth = logging.depth - 1;
