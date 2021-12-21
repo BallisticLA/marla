@@ -1,4 +1,4 @@
-function[Out1, Out2] = osid2(A, k, over, p, axis, s)
+function[Out1, Out2, log] = osid2(A, k, over, p, axis, s, logging)
 %{
     Sketch + (QRCP skeleton) + (least squares) approach to ID
     See Dong & Martinsson, 2021.
@@ -8,12 +8,15 @@ function[Out1, Out2] = osid2(A, k, over, p, axis, s)
 
     Row ID returns an approximation of the form:
     A ~= Out2 * (A(Out1(1 : k), :))
+
+    Important note: 
+    When calling a routine, use:
+    addpath('../../comps/rangefinders/');
 %}
     s = MarlaRandStream(s);
-    addpath('../../comps/rangefinders/');
     if axis == 0
         % Row ID
-        S = rs1(A, k + over, p, s);
+        [S, log] = rs1(A, k + over, p, s, logging);
         Y = A * S;
         [~, ~, I] = qr(Y', 'vector');
         Out2 = I(1 : k);
@@ -21,8 +24,8 @@ function[Out1, Out2] = osid2(A, k, over, p, axis, s)
         Out1 = A / A(Out2, :);
     elseif axis == 1
         % Column ID
-        S = rs1(A', k + over, p, s)';
-        Y = S * A;
+        [S, log] = rs1(A', k + over, p, s, logging);
+        Y = S' * A;
         [~, ~, J] = qr(Y, 'vector');
         Out2 = J(1 : k);
         Out2 = Out2(:);
