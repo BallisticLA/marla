@@ -1,4 +1,4 @@
-function[Js, U, Is] = cur1(A, k, over, p, s)
+function[Js, U, Is, log] = cur1(A, k, over, p, s, logging)
 %{
     Computes CUR Decomposition of matrix A.
     Relies on row ID algorithm.
@@ -25,13 +25,13 @@ function[Js, U, Is] = cur1(A, k, over, p, s)
 %}  
     s = MarlaRandStream(s);
     if size(A, 1) > size(A, 2)
-        [X, Js] = osid1(A, k, over, p, 1, s);
+        [X, Js, log] = osid1(A, k, over, p, 1, s, logging);
         [~, ~, Is] = qr(A(:, Js)', 0);
         Is = Is(:);  % to column vector
         Is = Is(1 : k);
         U = X / A(Is, :);
     else
-        [Z, Is] = osid1(A, k, over, p, 0, s);
+        [Z, Is, log] = osid1(A, k, over, p, 0, s, logging);
         [~, ~, Js] = qr(A(Is, :), 0);
         Js = Js(:);  % to row vector
         Js = Js(1:k);

@@ -17,6 +17,11 @@
     addpath('../../../../comps/interpolative') - for id helper routines.
 
 %}
+addpath('../../../../utils')
+addpath('../../../matrix_generators/')
+addpath('../../../../drivers/interpolative/')
+addpath('../../../../comps/rangefinders')
+addpath('../../../../comps/interpolative')
 
 osid = TestOSIDs();
 osid.test_simple_exact();
