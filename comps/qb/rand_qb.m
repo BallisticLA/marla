@@ -85,7 +85,7 @@ function [Q, B, log] = rand_qb(A, k, p, s, logging)
     B = Q' * A;
 
     % Relative error computation
-    if logging == 2 && log_present
+    if logging.span >= 2 && log_present
         log.A_fro_norm = norm(A, 'fro');
         log.absolute_error = norm(A - Q * B, 'fro');
     end
