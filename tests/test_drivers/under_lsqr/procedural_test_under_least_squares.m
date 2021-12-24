@@ -1,5 +1,5 @@
 % Throws an asserion error if something went wrong.
-function [] = test_under_least_squares()
+function [] = procedural_test_under_least_squares()
     seed0 = 3893874;
     addpath('../matrix_generators/');
 
