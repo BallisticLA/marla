@@ -41,26 +41,34 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     on runtime and the rate at which (preconditioned) normal equation
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
+
+    Important note:
+    Before running, use: 
+    addpath('../../Utils/Sketching_Operators')
     %}
-    s = MarlaRandStream(s);
-    if ~logging
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+    if logging.depth == 0 || logging.span == 0
+        log_present = 0;
+        log.status = 'Optional parameter for logging detailed information has not been passed.'; 
+    else
+        log_present = 1;
+        logging.depth = logging.depth - 1;
     end
+
+    s = MarlaRandStream(s);
     
     [num_rows, num_cols] = size(A);
     d = lstsq_dim_checks(sampling_factor, num_rows, num_cols);
     
     % Sketch the data matrix.
-    if logging, tic, end
+    if log_present, tic, end
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
-    addpath('../../Utils/Sketching_Operators')
     Omega = sjlt(double(d), double(num_rows), double(8), s);
     A_ske = Omega * A;
-    if logging, log.t_sketch = toc; end
+    if log_present, log.t_sketch = toc; end
     
     % Factor the sketch.
-    if logging, tic, end 
+    if log_present, tic, end 
     if ~use_chol
         [Q, R] = qr(A_ske, 0);
     else
@@ -68,10 +76,10 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
         % Gram matrix
         R = chol(A_ske' * A_ske, 'upper');
     end
-    if logging, log.t_factor = toc; end
+    if log_present, log.t_factor = toc; end
     
     % Sketch-and-solve type preprocessing.
-    if logging, tic, end
+    if log_present, tic, end
     b_ske = Omega * b;
     if ~use_chol
         z_ske = Q' * b_ske;
@@ -82,14 +90,14 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     if norm(A * x_ske - b, 'fro') >= norm(b)
         z_ske = zeros(num_cols, 1);
     end
-    if logging, log.t_presolve = toc; end
+    if log_present, log.t_presolve = toc; end
     
     % Iterative phase.
-    if logging, tic, end
+    if log_present, tic, end
     [res, ~, ~, iters, resvec, ~] = lsqr(A, b, tol, iter_lim, R, eye(size(R, 1)), x_ske);
-    if logging, log.t_iterate = toc; end    
+    if log_present, log.t_iterate = toc; end    
     
-    if logging
+    if log_present
         % Record a vector of cumulative times to (1) sketch and factor, and
         % (2) take an individual step in LSQR (amortized!).
         %

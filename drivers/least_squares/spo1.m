@@ -25,39 +25,47 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
     on runtime and the rate at which (preconditioned) normal equation
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
+
+    Important note:
+    Before running, use: 
+    addpath('../../Utils/Sketching_Operators')
     %}
-    s = MarlaRandStream(s);
-    if logging == 0
-        %disp('Optional parameter for logging detailed information has not been passed.'); 
+    if logging.depth == 0 || logging.span == 0
+        log_present = 0;
+        log.status = 'Optional parameter for logging detailed information has not been passed.'; 
+    else
+        log_present = 1;
+        logging.depth = logging.depth - 1;
     end
+
+    s = MarlaRandStream(s);
 
     [num_rows, num_cols] = size(A);
     d = lstsq_dim_checks(sampling_factor, num_rows, num_cols);
     
     % Sketch the data matrix.
-    if logging, tic, end
+    if log_present, tic, end
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
-    addpath('../../Utils/Sketching_Operators')
     Omega = sjlt(d, num_rows, 8, s);
     A_ske = Omega * A;
-    if logging, log.t_sketch = toc; end
+    if log_present, log.t_sketch = toc; end
     
     % Factor the sketch. 
     %  We also measure the time to scale the right singular vectors
     %   as needed for the preconditioner.
-    if logging, tic, end
+    if log_present, tic, end
     [U, S, V] = svd(A_ske, 'econ');
     S = diag(S);
     rank = nnz(S > S(1) * num_cols * eps('double'));
     N = V(:, 1:rank) ./ (S(1:rank)');
-    if logging, log.t_factor = toc; end
+    if log_present, log.t_factor = toc; end
     
     if smart_init
         % Sketch-and-solve type preprocessing.
         %   This isn't necessarily preferable, because it changes the
         %   norm of b, which affects termination criteria.  
-        if logging, tic, end
+        if log_present, tic, end
         b_ske = Omega * b;
         z_ske = (U(:, 1:rank)' * b_ske);
         x_ske = N * z_ske;
@@ -65,20 +73,20 @@ function [x_star, log] = spo1(A, b, sampling_factor, tol, iter_lim, smart_init, 
         if norm(b_remainder, 2) >= norm(b, 2)
             z_ske = zeros(size(A, 2), 1);
         end
-        if logging, log.t_presolve = toc; end
+        if log_present, log.t_presolve = toc; end
         
         % Iterative phase.
-        if logging, tic, end
+        if log_present, tic, end
         [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, x_ske);
-        if logging, log.t_iterate = toc; end 
+        if log_present, log.t_iterate = toc; end 
     else
         % No presolve
-       if logging, tic, end
+       if log_present, tic, end
        [x_star, iters, resvec] = cgls(A, b, tol, iter_lim, N, zeros(size(A, 2), 1));
-       if logging, log.t_iterate = toc; end 
+       if log_present, log.t_iterate = toc; end 
     end
     
-    if logging
+    if log_present
         % Record a vector of cumulative times to (1) sketch and factor, and
         % (2) take an individual step in LSQR (amortized!).
         %
