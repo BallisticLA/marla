@@ -1,4 +1,4 @@
-function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
+function[V, lambda, log] = evd2(A, k, over, num_passes, seed, logging)
 %{
      Return a matrix V and column vector lambda that define a positive 
      semidefinite matrix "A_approx" through its eigen-decomposition:
@@ -14,8 +14,8 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
      ||A_approx - A||. Increasing "num_passes" and "over" should result in
      better approximations.
  
-     Parameters
-     ----------
+     Input
+     -----
      A : matrix
          Data matrix to approximate. A must be an n × n Hermitian matrix.
  
@@ -36,6 +36,9 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
          Increasing this parameter is one way to obtain better
          approximations, especially at lower ranks.
 
+    seed: int or RandStream
+         Seed for rand stream.
+
      logging : struct array 
          Parameter for logging different levels of detailed information.
          Contains two fields:
@@ -45,8 +48,8 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
          1 for timings, 2 for timings + errors estimates, 3 for unusual 
          behaviors).
  
-     Returns
-     -------
+     Output
+     ------
      V : matrix
          Has size (n, d), where d = min(k, rank(A)).
          Columns are orthonormal.
@@ -73,14 +76,14 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, s, logging)
         logging.depth = logging.depth - 1;
     end
 
-    s = MarlaRandStream(s);
+    seed = MarlaRandStream(seed);
     class_A = class(A);
     n = size(A, 1);
     assert(k < n);
     % By default, a Gaussian random sketching matrix is used.
     % Alternative choices are present in '../Sketching_Operators'
     if log_present, tic, end
-    Omega = randn(s, n, k + over, class_A);
+    Omega = randn(seed, n, k + over, class_A);
     [Q, ~] = qr(A * Omega, 0);
     if log_present, log.t_sketch = toc; end
     % Power Iterations

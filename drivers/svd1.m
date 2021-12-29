@@ -1,4 +1,4 @@
-function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
+function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, seed, logging)
 %{
     Return U, S, V where, for some integer ell <= k,
         U is size(A, 1)-by-ell,
@@ -6,8 +6,9 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
         V is ell-by-size(A, 2),
         so that
         A \approx U * diag(S) * V
-    Parameters
-    ----------
+
+    Input
+    -----
     A : matrix
         Data matrix to approximate
 
@@ -44,7 +45,8 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
         to Q at each iteration (except possibly the final iteration).
         dependent.
 
-    s : int or RandomStream
+    seed: int or RandStream
+         Seed for rand stream.
 
     logging : struct array 
         Parameter for logging different levels of detailed information.
@@ -55,8 +57,8 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
         1 for timings, 2 for timings + errors estimates, 3 for unusual 
         behaviors).
 
-     Returns
-     -------
+     Output
+     ------
      U : matrix
          Orthonormal
  
@@ -75,6 +77,7 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
     for some QB implementations.
     
     Important note:
+    ---------------
     before calling this routine, use:
     addpath('../utils') - for MatrlaRandStream.m
     addpath('../comps/qb') - for different versions of QB algorithm.
@@ -87,11 +90,11 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, s, logging)
         logging.depth = logging.depth - 1;
     end
 
-    s = MarlaRandStream(s);
+    seed = MarlaRandStream(seed);
     % Using a version of QB algorithm. Alternative versions may be found in
     % '../comps/qb'. 
     if log_present, tic, end
-    [Q, B, log] = rand_qb_b(A, block_size, tol, k, p, s, logging);
+    [Q, B, log] = rand_qb_b(A, block_size, tol, k, p, seed, logging);
     if log_present, log.t_qb = toc; end
     % Using a built-in function for computing an SVD. 
     if log_present, tic, end

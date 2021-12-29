@@ -1,4 +1,4 @@
-function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logging)
+function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, seed, logging)
  %{
      Return a matrix V and column vector lambda that define a symmetric matrix
      "A_approx" through its eigen-decomposition:
@@ -9,8 +9,8 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
      The columns of V are approximations of the dominant eigenvectors of A.
      The entries of lambda are the corresponding approximate eigenvalues.
  
-     Parameters
-     ----------
+     Input
+     -----
      A : matrix
          Data matrix to approximate. Must be n × n and symmetric matrix.
  
@@ -40,6 +40,9 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
          block_size at each iteration (with safeguards so we never exceed
          the rank of A).
 
+    seed: int or RandStream
+         Seed for rand stream.
+
      logging : struct array 
          Parameter for logging different levels of detailed information.
          Contains two fields:
@@ -49,8 +52,8 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
          1 for timings, 2 for timings + errors estimates, 3 for unusual 
          behaviors).
  
-     Returns
-     -------
+     Output
+     ------
      V : matrix
          Has size (n, d), where d <= min(k, rank(A)).
          Columns are orthonormal.
@@ -62,8 +65,8 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
          Holds fields with logged information on routine - fields depend on
          subroutines used.
  
-    Notes 
-    -----
+    Important note: 
+    ---------------
     Before calling this routine, use:
     addpath('../utils') - for MatrlaRandStream.m
     addpath('../comps/qb') - for different versions of QB algorithm.
@@ -77,9 +80,9 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, s, logg
         logging.depth = logging.depth - 1;
     end
 
-    s = MarlaRandStream(s);
+    seed = MarlaRandStream(seed);
     if log_present, tic, end
-    [Q, B, log] = rand_qb_b(A, block_size, tol / 2, k + over, num_passes, s, logging);
+    [Q, B, log] = rand_qb_b(A, block_size, tol / 2, k + over, num_passes, seed, logging);
     if log_present, log.t_qb = toc; end
     % B = Q' * A is necessary.
     C = B * Q;

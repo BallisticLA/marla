@@ -1,12 +1,13 @@
-function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, s)
+function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, seed)
 %{
     SVD-based sketch-and-precondition for underdetermined least squares
         min ||y||
         s.t. A' y = c
     where A is tall.
 
-    Important note:
-    Before running, use:
+    Important note: 
+    ---------------
+    Before calling this routine, use:
     addpath('../../utils/sketching_operators');
     addpath('../../comps/preconditioning/');
     addpath('../../comps/itersaddle/');
@@ -19,7 +20,7 @@ function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, s)
             logging.depth = logging.depth - 1;
         end
 
-        s = MarlaRandStream(s);
+        seed = MarlaRandStream(seed);
 
         [n_rows, n_cols] = size(A);
         d = lstsq_dim_checks(sampling_factor, n_rows, n_cols);
@@ -28,7 +29,7 @@ function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, s)
         if log_present, tic, end
         % By default, a SJLT sketching matrix is used.
         % Alternative choices are present in '../../Utils/Sketching_Operators'.
-        Omega = sjlt(double(d), double(n_rows), double(8), s);
+        Omega = sjlt(double(d), double(n_rows), double(8), seed);
         A_ske = Omega * A;
         if log_present, log.t_sketch = toc; end
 

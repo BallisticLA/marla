@@ -1,4 +1,10 @@
- function [d] = lstsq_dim_checks(sampling_factor, num_rows, num_cols)
+function [d] = lstsq_dim_checks(sampling_factor, num_rows, num_cols)
+%{
+    Small helper routine, used in lsqr algorithms.
+    Takes in integer values of the size of input data and
+    a floating point sampling factor, rturns the integer leading dimension
+    of the sketching operator. 
+%}
     assert(num_rows >= num_cols);
     d = cast((sampling_factor * num_cols), 'uint32');
     if d > num_rows

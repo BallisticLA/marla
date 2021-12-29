@@ -1,4 +1,4 @@
-function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, logging, s)
+function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, logging, seed)
     %{
     A sketch-and-precondition approach to overdetermined ordinary least
     squares. This implementation uses QR (when use_chol=false) or Cholesky
@@ -42,8 +42,53 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     error decays while LSQR runs. Controlled by passing a boolean parameter
     "logging".
 
-    Important note:
-    Before running, use: 
+    Input
+    -----
+    A : matrix
+        Data matrix
+
+    b : vector
+        Data array
+
+    sampling_factor : float
+        Defines the leading dimension of a sketching operator.
+
+    over : int
+        Oversampling parameter
+
+    tol : float
+        The target error used by the randomized part of the algorithm.
+
+    iter_lim : int
+        Maximum number of iterations of lsqr subroutine. 
+
+    use_chol : bool
+        Using Cholesky at the preprocessing stage.
+
+    logging : struct array 
+        Parameter for logging different levels of detailed information.
+        Contains two fields:
+        Depth - describes on how many subroutines levels should the info
+        be logged (0 for none, 1 for just the main routine, etc).
+        Span - describes which types of info should be logged (0 for none,
+        1 for timings, 2 for timings + errors estimates, 3 for unusual 
+        behaviors).
+
+    seed: int or RandStream
+         Seed for rand stream.
+
+     Output
+     ------
+     x_star: vector
+        Approximation to the solution of the given system.
+
+     log : structure array
+         Holds fields with logged information on routine - fields depend on
+         subroutines used.
+
+    Important note: 
+    ---------------
+    Before calling this routine, use:
     addpath('../../Utils/Sketching_Operators')
     %}
     if logging.depth == 0 || logging.span == 0
@@ -54,7 +99,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
         logging.depth = logging.depth - 1;
     end
 
-    s = MarlaRandStream(s);
+    seed = MarlaRandStream(seed);
     
     [num_rows, num_cols] = size(A);
     d = lstsq_dim_checks(sampling_factor, num_rows, num_cols);
@@ -63,7 +108,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     if log_present, tic, end
     % By default, a SJLT sketching matrix is used.
     % Alternative choices are present in '../../Utils/Sketching_Operators'.
-    Omega = sjlt(double(d), double(num_rows), double(8), s);
+    Omega = sjlt(double(d), double(num_rows), double(8), seed);
     A_ske = Omega * A;
     if log_present, log.t_sketch = toc; end
     
