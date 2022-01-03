@@ -6,8 +6,7 @@
 
     Currently, avoids using logging parameter.
 
-    Important note: 
-    Before running tets, use the following:
+    Before running tets, the following is used:
     
     addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../comps/qb') - for different versions of QB algorithm.
@@ -15,7 +14,6 @@
     rangefinders.
     addpath('../matrix_generators/') - for matrix generators
 %}
-% QB-backed algorithm
 addpath('../../utils') 
 addpath('../../comps/qb') 
 addpath('../../comps/rangefinders') 

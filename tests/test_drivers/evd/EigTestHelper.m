@@ -1,12 +1,23 @@
 classdef EigTestHelper
-    %EIGTESTHELPER Summary of this class goes here
-    %   Detailed explanation goes here
+%{
+    Objects of thsi class hold values for algorithm input and output 
+    parameters; functions represent unit tests. 
+%}
     
     properties
+        % Initial data matrix (for tests, randomly generated).
         A
+
+        % Orthonormal matrix
         V
+
+        % Vector of eigenvalues
         lamb
+
+        % Frobenius norm of A
         fro_A
+
+        % Approximations
         V_approx
         lamb_approx
     end
@@ -18,6 +29,7 @@ classdef EigTestHelper
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods
 
+        % Initialization function.
         function obj = EigTestHelper(A, V, lambda)
             obj.A = A;
             obj.fro_A = norm(A, 'fro');
@@ -25,11 +37,14 @@ classdef EigTestHelper
             obj.lamb = lambda;
         end
         
+        % Checks matching dimensions. 
         function [] = test_conformable(obj)
             assert(size(obj.lamb_approx,1) == size(obj.V_approx, 2));
             assert(size(obj.V_approx, 1) == size(obj.A, 1));
         end
 
+        % Checks whether the matrix V is orthonormal (difference up to a 
+        % specified tolerance).
         function [] = test_valid_onb(obj, fro_tol)
             V = obj.V_approx;
             lamb = obj.lamb_approx;
@@ -38,7 +53,9 @@ classdef EigTestHelper
             nrm_V = norm(delta_V, 'fro');
             assert(nrm_V <= fro_tol);
         end
-
+        
+        % Checks the size of eigenvalue vector, as well as magnitude of the
+        % smallest eigenvalue.
         function [] = test_eigvals(obj, psd)
             lamb = obj.lamb_approx;
             assert(length(lamb) <= length(obj.lamb));
@@ -50,6 +67,7 @@ classdef EigTestHelper
             end
         end
 
+        % Checks the approximation quality (up to a specified tolerance).
         function [] = test_fro_error(obj, rel_fro_tol)
             V = obj.V_approx;
             lamb = obj.lamb_approx;
@@ -66,6 +84,7 @@ classdef EigTestHelper
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    % Initial data conevsion from SVD to EVD form. 
     methods(Static)
         function eth = convert(U, spectrum, psd, s)
             if psd

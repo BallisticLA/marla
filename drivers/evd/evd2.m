@@ -65,8 +65,9 @@ function[V, lambda, log] = evd2(A, k, over, num_passes, seed, logging)
     -----
     Sketch construction stage - alternative options are available in 
     '../rangefinders'.
+
     Before calling this routine, use:
-    addpath('../utils') - for MatrlaRandStream.m
+    addpath('../../utils') - for MatrlaRandStream.m
 %}
     if logging.depth == 0 || logging.span == 0
         log_present = 0;

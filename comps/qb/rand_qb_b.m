@@ -70,9 +70,10 @@ function [Q, B, log] = rand_qb_b(A, block_size, tol, k, p, s, logging)
     References
     ----------
     Algorithm 2 from YGL:2018.
-    ----------
-    Important note:
-    before calling this routine, use:
+
+    Important note: 
+    ---------------
+    Before calling this routine, use
     addpath('../utils') - for MatrlaRandStream.m
     addpath('../randgefinders') - for different versions of rangefinders.
 %}

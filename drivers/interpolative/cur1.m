@@ -6,10 +6,12 @@ function[Js, U, Is, log] = cur1(A, k, over, p, seed, logging)
     Rank-k approximation of A is then present as:
     A ~= Js * U * Is.
 
+    Primarily used as a version of low-rank approximation.
+
     Input
     ----------
     A : matrix
-        Data matrix to approximate
+        Data matrix to approximate. Said to be of size m by n.
 
     k : int
         The returned approximation will be truncated to rank k.
@@ -37,10 +39,15 @@ function[Js, U, Is, log] = cur1(A, k, over, p, seed, logging)
     Output
     ----------
     Js : matrix
-        
+        Size m by k.
+        Consists of columns of A.
+
     U : matrix
-    
+        Size k by k.
+
     Is : matrix
+        Size k by n.
+        Consists of rows of A.
 
     log : structure array
          Holds fields with logged information on routine - fields depend on
@@ -49,6 +56,11 @@ function[Js, U, Is, log] = cur1(A, k, over, p, seed, logging)
     Reference
     ----------
     Section 2.5 of https://arxiv.org/pdf/1502.05366.pdf - RSVDPACK notes.
+
+    Important note: 
+    ---------------
+    Before calling this routine, use:
+    addpath('../../utils') - for MatrlaRandStream.m
 %}  
     seed = MarlaRandStream(seed);
     if size(A, 1) > size(A, 2)

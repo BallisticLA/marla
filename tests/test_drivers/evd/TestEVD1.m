@@ -1,11 +1,16 @@
 classdef TestEVD1 < TestEVDecomposer
-    
+%{
+    Test class for EVD1. Uses TestEVDecomposer as a subclass to run unit
+    tests in batches.
+%}  
     
     methods
         function obj = TestEVD1(psd)
             obj = obj@TestEVDecomposer(psd);
         end
         
+        % Fixed rank tets - target tolerance is set to NaN, so the
+        % algorithm terminates upon reaching rank k.
         function [] = test_fr(obj)
             addpath('../../matrix_generators/');
             addpath('../../../drivers/evd/');
@@ -26,6 +31,8 @@ classdef TestEVD1 < TestEVDecomposer
             obj.run_batch(eth, alg, rank - 3, NaN, 1e-8, 5, logging);
         end
 
+        % Test with a ~bad quality approximation - algorithm  tolerance is 
+        % set to a relatively high value.
         function [] = test_fp_inexact(obj)
             addpath('../../matrix_generators/');
             addpath('../../../drivers/evd/');
@@ -49,6 +56,8 @@ classdef TestEVD1 < TestEVDecomposer
             obj.run_batch(eth, alg, n, rel_err, 1e-8, 3, logging);
         end
 
+        % Test with algorithm tolerance lower tan test tolrance - good
+        % approximation.
         function [] = test_fp_exact(obj)
             num_passes = 2;
             block_size = 2;

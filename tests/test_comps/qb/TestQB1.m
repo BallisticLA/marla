@@ -1,13 +1,20 @@
+% Comment: how can i loop through a structure of objects?
 
-% Comment: how can i loop through a tructure of objects?
 classdef TestQB1 < TestQBecomposer
-    
+%{
+    Test class, with functions that represent runs of different QB
+    algorithms with varying input parameters. Uses TestQBcomposer as a
+    subclass to run unit tests in batches. 
+%}    
     
     methods
         function obj = TestQB1()
             obj = obj@TestQBecomposer();
         end
         
+        % Runs a batch of unit tests for every QB algorithm, using input
+        % data of varying rank and shape (for both low-rank and full-rank
+        % cases). 
         function [] = run_var_rank(obj)
             
             spectrum = 0;
@@ -60,13 +67,13 @@ classdef TestQB1 < TestQBecomposer
             obj.run_exact(qth, alg_4, gen_1, 50, 200, 50, alg_tol, test_tol, logging); 
         end
 
+        % Runs a batch of unit tests for every QB algorithm, attempting to
+        % produce an approximation of rank that is higher than rank of an
+        % input matrix.
         function [] = run_overestimated(obj)
             
             spectrum = 0;
-            t = 2; % 150
             A = [];
-            Q = [];
-            B = [];
             alg_tol = 1e-8;
             test_tol = 1e-8;
             p = 1;
@@ -100,14 +107,13 @@ classdef TestQB1 < TestQBecomposer
             obj.run_estimated(qth, alg_4, gen_1, 50, 200, floor(15 * 1.2), alg_tol, test_tol, logging);
         end
 
+        % Runs a batch of unit tests for every QB algorithm, using input
+        % matrices with rapidly dcaying singular values.
         function [] = run_fast_decay(obj)
             
-            spectrum = 0;
-            % Controls the "spped" of singular value decay.
+            % Controls the "speed" of singular value decay.
             t = 2;
             A = [];
-            Q = [];
-            B = [];
             alg_tol = 1e-8;
             test_tol = 1e-8;
             p = 1;
@@ -136,15 +142,13 @@ classdef TestQB1 < TestQBecomposer
             obj.run_exact(qth, alg_4, gen_2, 200, 50, 15, alg_tol, test_tol, logging); 
         end
 
+        % Runs a batch of unit tests for every QB algorithm, using input
+        % matrices with slowly dcaying singular values.
         function [] = run_slow_decay(obj)
             
-            spectrum = 0;
             % Controls the "spped" of singular value decay.
             t = 150;
-            seed = 24;
             A = [];
-            Q = [];
-            B = [];
             alg_tol = 1e-8;
             test_tol = 1e-8;
             p = 1;
@@ -172,12 +176,12 @@ classdef TestQB1 < TestQBecomposer
             % QB4
             obj.run_exact(qth, alg_4, gen_2, 200, 50, 15, alg_tol, test_tol, logging); 
         end
-
+        
+        % Runs a batch of unit tests for every QB algorithm, using input
+        % matrices with singular values, decaying in an s-shape.
         function [] = run_s_shaped_decay(obj)
             
             A = [];
-            Q = [];
-            B = [];
             alg_tol = 1e-8;
             test_tol = 1e-8;
             p = 1;

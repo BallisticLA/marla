@@ -68,8 +68,8 @@ function[V, lambda, log] = evd1(A, k, tol, over, num_passes, block_size, seed, l
     Important note: 
     ---------------
     Before calling this routine, use:
-    addpath('../utils') - for MatrlaRandStream.m
-    addpath('../comps/qb') - for different versions of QB algorithm.
+    addpath('../../utils') - for MatrlaRandStream.m
+    addpath('../../comps/qb') - for different versions of QB algorithm.
  %}
       
     if logging.depth == 0 || logging.span == 0

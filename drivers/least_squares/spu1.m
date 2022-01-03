@@ -8,6 +8,7 @@ function[y, log] = spu1(A, c, sampling_factor, tol, iter_lim, logging, seed)
     Important note: 
     ---------------
     Before calling this routine, use:
+    addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../utils/sketching_operators');
     addpath('../../comps/preconditioning/');
     addpath('../../comps/itersaddle/');

@@ -89,6 +89,7 @@ function [res, log] = spo3(A, b, sampling_factor, tol, iter_lim, use_chol, loggi
     Important note: 
     ---------------
     Before calling this routine, use:
+    addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../Utils/Sketching_Operators')
     %}
     if logging.depth == 0 || logging.span == 0

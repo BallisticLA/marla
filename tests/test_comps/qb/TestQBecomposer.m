@@ -1,5 +1,11 @@
 classdef TestQBecomposer
-    
+%{
+    Class contains functions for generation of input data and running the 
+    specified QB algorithm, as well as composition of unit tests into 
+    batches. 
+%}    
+
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %
     %   Instance methods
@@ -10,6 +16,12 @@ classdef TestQBecomposer
         function obj = TestQBecomposer()
         end
 
+        %{
+        Functions, composing tests for approximations of exact rank (k = rank(A)).
+        qth - QbTestHelper object.
+        alg - version of qb algorithm.
+        gen - version of matrix generatior function.
+        %}
         function[] = run_exact(obj, qth, alg, gen, m, n, rank, target_tol, test_tol, logging)
             
             seed = 24;
@@ -27,6 +39,12 @@ classdef TestQBecomposer
             qth.test_exact_rank_B();
         end
 
+        %{
+        Functions, composing tests for non-xact rank approximations (k != rank(A)).
+        qth - QbTestHelper object.
+        alg - version of qb algorithm.
+        gen - version of matrix generatior function.
+        %}
         function[] = run_estimated(obj, qth, alg, gen, rank, target_tol, test_tol, logging)
             
             seed = 24;

@@ -1,5 +1,10 @@
 classdef TestEVDecomposer
-    
+%{
+    Class contains functions for running the 
+    specified evd algorithm, as well as composition of unit tests into 
+    batches. 
+%}  
+
     properties
         SEEDS = [1,2,3];
         PSD = false;
@@ -16,7 +21,7 @@ classdef TestEVDecomposer
         function obj = TestEVDecomposer(psd)
             obj.PSD = psd;
         end
-
+        
         function [] = run_batch(obj, eth, revd, target_rank,...
                 target_tol, test_tol, over, logging)
             % obj: TestEVDecomposer

@@ -1,15 +1,17 @@
 function [x_ske] = sso1(A, b, sampling_factor, seed) 
 %{
-A sketch-and-solve approach to overdetermined ordinary least squares.
-Uses direct method to solve the overdetermined problem.
-----------
-The sketch-and-solve approach is attributed to a 2006 paper by Sarlos:
-"Improved approximation algorithms for large matrices via random
-projections." An introduction and summary of this approach can be found
-in [MT:2020, Sections 10.2 -- 10.3].
+    A sketch-and-solve approach to overdetermined ordinary least squares.
+    Uses direct method to solve the overdetermined problem.
+    ----------
+    The sketch-and-solve approach is attributed to a 2006 paper by Sarlos:
+    "Improved approximation algorithms for large matrices via random
+    projections." An introduction and summary of this approach can be found
+    in [MT:2020, Sections 10.2 -- 10.3].
+
     Important note: 
     ---------------
     Before calling this routine, use:
+    addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../Utils/Sketching_Operators')
 %}
     seed = MarlaRandStream(seed);

@@ -16,7 +16,11 @@
     addpath('../../../drivers/') - for access to svd1.
 %}
 
-% Add all paths here
+addpath('../../../utils');
+addpath('../../../comps/qb');
+addpath('../../../comps/rangefinders');
+addpath('../../../drivers/');
+
 tsvd1 = TestSVD1();
 tsvd1.test_fr();
 tsvd1.test_fp_inexact();

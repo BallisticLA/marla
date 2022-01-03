@@ -63,9 +63,10 @@ function [Q, B, log] = rand_qb_b_pe(A, block_size, tol, k, p, s, logging)
     References
     ----------
     This implements a variant of [YGL:2018, Algorithm 4].
-    ----------
-    Important note:
-    before calling this routine, use:
+
+    Important note: 
+    ---------------
+    Before calling this routine, use
     addpath('../utils') - for MatrlaRandStream.m
 %}
     if logging.depth == 0 || logging.span == 0

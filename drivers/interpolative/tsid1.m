@@ -11,7 +11,7 @@ function[Z, Is, X, Js, log] = tsid1(A, k, over, p, seed, logging)
     
     ----------
     A : matrix
-        Data matrix to approximate
+        Data matrix to approximate. Said to be of size m by n.
 
     k : int
 
@@ -39,12 +39,18 @@ function[Z, Is, X, Js, log] = tsid1(A, k, over, p, seed, logging)
     Output
     ----------
     Z : matrix
+        Size m by k.
 
-    Is : matrix
+    Is : vector
+        Size k by 1.
+        Values represent select rows of matrix A.
 
     X : matrix
+        Size k by n.
 
-    Js : matrix
+    Js : vector
+        Size k by 1.
+        Values represent select columns of matrix A.
 
     log : structure array
          Holds fields with logged information on routine - fields depend on
@@ -53,6 +59,7 @@ function[Z, Is, X, Js, log] = tsid1(A, k, over, p, seed, logging)
     Important note: 
     ---------------
     Before calling this routine, use:   
+    addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../comps/interpolative/');
 %}
     seed = MarlaRandStream(seed);

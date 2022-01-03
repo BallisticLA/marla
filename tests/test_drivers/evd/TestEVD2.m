@@ -1,10 +1,15 @@
 classdef TestEVD2 < TestEVDecomposer
-    
+%{
+    Test class for EVD2. Uses TestEVDecomposer as a subclass to run unit
+    tests in batches.
+%}  
     methods
         function obj = TestEVD2()
             obj = obj@TestEVDecomposer(true);
         end
         
+        % Fixed rank tets - target tolerance is set to NaN, so the
+        % algorithm terminates upon reaching rank k.
         function [] = test_fr(obj)
             num_passes = 3;
             logging.depth = 0;

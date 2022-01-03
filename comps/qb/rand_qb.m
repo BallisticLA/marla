@@ -62,9 +62,9 @@ function [Q, B, log] = rand_qb(A, k, p, s, logging)
     subspace iteration, where Zhang and Mascagni's Algorithm
     implementation requires >= 2 steps.
     
-    ----------
-    Important note:
-    before calling this routine, use:
+    Important note: 
+    ---------------
+    Before calling this routine, use:
     addpath('../utils') - for MatrlaRandStream.m
     addpath('../randgefinders') - for different versions of rangefinders.
 %}

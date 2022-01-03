@@ -79,8 +79,8 @@ function [U, S, V, log] = svd1(A, k, tol, over, p, block_size, seed, logging)
     Important note:
     ---------------
     before calling this routine, use:
-    addpath('../utils') - for MatrlaRandStream.m
-    addpath('../comps/qb') - for different versions of QB algorithm.
+    addpath('../../utils') - for MatrlaRandStream.m
+    addpath('../../comps/qb') - for different versions of QB algorithm.
 %}
     if logging.depth == 0 || logging.span == 0
         log_present = 0;

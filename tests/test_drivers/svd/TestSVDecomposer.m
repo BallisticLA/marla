@@ -1,5 +1,11 @@
 classdef TestSVDecomposer
-    
+   
+%{
+    Class contains functions for running the 
+    specified rsvd algorithm, as well as composition of unit tests into 
+    batches. 
+%}   
+
     properties
         SEEDS = [38972, 653, 1222];
     end
@@ -14,6 +20,7 @@ classdef TestSVDecomposer
         function obj = TestSVDecomposer()
         end
 
+        % Composes unit tests together, runs the svd algorithm.
         function [] = run_batch(obj, sth, rsvd, target_rank,...
                 target_tol, test_tol, over, logging)
             % obj: TestSVDecomposer

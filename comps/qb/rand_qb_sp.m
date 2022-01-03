@@ -46,9 +46,10 @@ function [Q, B, log] = rand_qb_sp(A, k, s, logging)
     ----------
     Initial idea stated in section 5.5 of  Halko, Nathan, Per-Gunnar
     Martinsson, and Joel A. Tropp's paper. Further developed in YGL:2018.
-    ----------
-    Important note:
-    before calling this routine, use:
+
+    Important note: 
+    ---------------
+    Before calling this routine, use
     addpath('../utils') - for MatrlaRandStream.m
 %}
     if logging.depth == 0 || logging.span == 0

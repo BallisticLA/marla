@@ -3,6 +3,7 @@ classdef SvdTestHelper
     %   Detailed explanation goes here
     
     properties
+        % Initial data matrix (for tests, randomly generated).
         A
         U
         s
@@ -20,7 +21,8 @@ classdef SvdTestHelper
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods
-
+        
+        % Initialization function, setsU_approx, s_approx, V_approx to empty matrices.
         function obj = SvdTestHelper(A, U, s, Vt)
             obj.A = A;
             obj.U = U;
@@ -31,6 +33,7 @@ classdef SvdTestHelper
             obj.V_approx = [];
         end
 
+        % Checks dimensions matrching.
         function[] = test_conformable(self)
             s = diag(self.s);
 
@@ -40,6 +43,8 @@ classdef SvdTestHelper
             assert(size(self.Vt, 2) == size(self.A, 2));
         end
         
+        % Checks whether matrices V and U are orthonormal (difference up to a 
+        % specified tolerance).
         function[] = test_valid_onb(self, tol)
             U = self.U_approx;
             V = self.V_approx;
@@ -55,6 +60,8 @@ classdef SvdTestHelper
             assert(nrm <= tol);
         end
         
+        % Checks the amount of approximated singular values, as well as the
+        % magnitude of the smallest singular value. 
         function[]  = test_valid_singvals(self, test_tol)
             s_exact = self.s;
             s = diag(self.s_approx)';
@@ -63,6 +70,8 @@ classdef SvdTestHelper
             assert(min(size(s)) >= 0);
         end
         
+        % Checks the quality of initial data approximation (with specified
+        % tolerance).
         function[] = test_abs_fro_error(self, rel_tol)
             A = self.A;
             U = self.U_approx;
@@ -83,17 +92,6 @@ classdef SvdTestHelper
             % ^ Scale by  Frobenius norm of A.
             % assert(nrm <= rel_tol)
             assert(nrm <= rel_tol);
-        end
-    end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %
-    %   Static methods
-    %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    methods(Static)
-        function sth = convert(A, U, s, Vt)
-            sth = SvdTestHelper(A, U, s, Vt);
         end
     end
 end

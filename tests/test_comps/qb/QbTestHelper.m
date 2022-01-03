@@ -1,11 +1,20 @@
 classdef QbTestHelper
-    %EIGTESTHELPER Summary of this class goes here
-    %   Detailed explanation goes here
+%{
+    Objects of this class hold values for algorithm input and output 
+    parameters; functions represent unit tests. 
+%}
     
     properties
-        A
+        % Initial data matrix (for tests, randomly generated).
+        A 
+
+        % Orthonormal matrix Q of the QB decomposition.
         Q
+
+        % Matrix B of the QB decomposition.
         B
+
+        % Rank of the QB approximation.
         k
     end
     
@@ -15,19 +24,17 @@ classdef QbTestHelper
     %
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     methods
-
+        
+        % Initialization function, sets Q and B to empty matrices.
         function obj = QbTestHelper(A, k)
             obj.A = A;
             obj.Q = [];
             obj.B = [];
             obj.k = k;
         end
-        
-        function [] = test_conformable(obj)
-            assert(size(obj.lamb_approx,1) == size(obj.V_approx, 2));
-            assert(size(obj.V_approx, 1) == size(obj.A, 1));
-        end
-
+    
+        % Checks if the difference between the initial matrix and
+        % approximation is within the specified tolerance.
         function[] = test_exact(obj, tol)
             A = obj.A;
             Q = obj.Q;
@@ -38,6 +45,8 @@ classdef QbTestHelper
             assert(nrm <= tol);
         end
         
+        % Checks whether the matrix Q is orthonormal (difference up to a 
+        % specified tolerance).
         function[] = test_valid_onb(obj, tol)
             Q = obj.Q;
 
@@ -47,6 +56,7 @@ classdef QbTestHelper
             assert(nrm <= tol);
         end
         
+        % Checks the quality of computation of matrix B.
         function[] = test_exact_B(obj, tol)
             A = obj.A;
             Q = obj.Q;
@@ -57,21 +67,10 @@ classdef QbTestHelper
             assert(nrm <= tol);
         end
         
+        % Check if matrix B has proper rank. 
         function[] = test_exact_rank_B(obj)
             B = obj.B;
             assert(rank(B) == min(size(B))); 
-        end
-    end
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %
-    %   Static methods
-    %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-    methods(Static)
-        function qth = convert(A, Q, B)
-            qth = QbTestHelper(A, Q, B);
         end
     end
 end

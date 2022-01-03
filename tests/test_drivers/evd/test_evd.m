@@ -15,6 +15,11 @@
     rangefinders.
     addpath('../../../drivers/evd') - for different versions of evd.
 %}
+addpath('../../../utils');
+addpath('../../../comps/qb');
+addpath('../../../comps/rangefinders'); 
+addpath('../../../drivers/evd');
+
 % QB-backed algorithm
 tevd1 = TestEVD1(false);
 tevd1.test_fr();

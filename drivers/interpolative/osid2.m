@@ -12,7 +12,7 @@ function[Out1, Out2, log] = osid2(A, k, over, p, axis, seed, logging)
     Input
     ----------
     A : matrix
-        Data matrix to approximate
+        Data matrix to approximate. Said to be of size m by n.
 
     k : int
 
@@ -43,8 +43,11 @@ function[Out1, Out2, log] = osid2(A, k, over, p, axis, seed, logging)
     Output
     ----------
     Out1 : matrix
+        Size k by n if column ID and size m by k if row ID.
         
-    Out2 : matrix
+    Out2 : vector
+        Size k by 1.
+        Values represent select columns of matrix A. 
 
     log : structure array
          Holds fields with logged information on routine - fields depend on
@@ -53,6 +56,7 @@ function[Out1, Out2, log] = osid2(A, k, over, p, axis, seed, logging)
     Important note: 
     ---------------
     Before calling this routine, use:
+    addpath('../../utils') - for MatrlaRandStream.m
     addpath('../../comps/rangefinders/');
 %}
     seed = MarlaRandStream(seed);
