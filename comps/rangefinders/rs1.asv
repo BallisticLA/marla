@@ -7,10 +7,15 @@ function [Omega, log] = rs1(A, k, p, passes_per_stab, seed, logging)
     Power iteration technique (recommended for cases with slow decay 
     of singular values of A) is controlled by parameter 'p' (>= 0). Additionally,
     stabilization (used to avoid accumulation of numerical error) is
-    controlled by parameter 'passes_per_stab' (>= 1). By default, utilizes
-    LU for stabilization (alternatively, can use TSQR).
+    controlled by parameter 'passes_per_stab' (>= 1)
 
-    seed is an int or RandomStream. It controls all random number generation.
+    s is an int or RandomStream. It controls all random number generation.
+
+    Uses QR decomposition for insuring orthogonality of the columns of
+    sketch Q.
+
+    Allows for any number of passes over the initial matrix A.
+    Uses LU factorization for stabilization during power iterations step. 
     %}
     if logging.depth == 0 || logging.span == 0
         log_present = 0;

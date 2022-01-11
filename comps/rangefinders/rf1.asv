@@ -4,6 +4,10 @@ function [Q, log] = rf1(A, k, p, seed, logging)
     (size(A, 2), k) where range(Q) is "reasonably" well aligned with 
     the span of the top k right singular vectors of A.
 
+    Uses power iteration technique (recommended for cases with slow decay 
+    of singular values of A), controlled by parameter p. Each power
+    iteratin step requires two passes over A.
+
     s is an int or RandomStream. It controls all random number generation.
 
     Uses QR decomposition for insuring orthogonality of the columns of
@@ -16,10 +20,7 @@ function [Q, log] = rf1(A, k, p, seed, logging)
         log_present = 1;
     end
 
-    % Set to a default value. 
-    passes_per_stab = 1;
-
     seed = MarlaRandStream(seed);
-    [Omega, log] = rs1(A, k, p, passes_per_stab, seed, logging);
+    Omega = rs1(A, k, p, passes_per_stab, seed, logging);
     [Q, ~] = qr(A * Omega, 0);
 end
