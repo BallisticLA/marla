@@ -28,9 +28,9 @@ function [Omega, log] = rs1(A, k, p, passes_per_stab, seed, logging)
     % '../../utils/sketching_operators'.
     if log_present, tic, end
     if mod(p, 2) == 0
-        Omega = randn(seed, m, k, class_A);     
+        Omega = randn(seed, n, k, class_A);     
     else
-        Omega = A' * randn(seed, n, k, class_A);
+        Omega = A' * randn(seed, m, k, class_A);
         p_done = p_done + 1;
         if mod(p_done, passes_per_stab) == 0
             [Omega, ~] = lu(Omega);
