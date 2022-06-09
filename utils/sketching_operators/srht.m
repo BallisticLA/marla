@@ -1,33 +1,45 @@
-function[Omega] = srht(A, d, s)
-    %{
-    Constructs a sketching operator of size (size(A, 2), d) using
-    subsampled randomized discrete Walsh-Hadamar transform.
+function SA = srht(A, d, s)
+    %Outputs the sketch S*A where S is the subsampled randomized discrete
+    %Walsh-Hadamar transform.
+    %
+    %Utilizes Matlab's built-in fwht() function.
+    %
+    %Serves an illustrative matter, rather than an efficient
+    %implementation.
+    %
+    %Parameters
+    %----------
+    %A : matrix
+    %    matrix to be sketched
+    %d : int
+    %    target embedding dimension
+    %s : int or RandomStream
+    %    Controls random number generation
+    %Returns
+    %-------
+    %SA : Sketch of A of size (d, size(A,2))
 
-    Utilizes Matlab's built-in fwht() function.
-
-    Serves an illustrative matter, rather than an efficient implementation.
-
-    s is an integer seed or a RandomStream
-    %}
     s = MarlaRandStream(s);
-    [m, n] = size(A);
-    % Generating a random sign vector
-    sgn = (rand(s, 1, n) < .5) * 2 - 1;
-    % Randomly changing signs of columns of A
-    A = bsxfun(@times, A, sgn);
+    m = size(A, 1);
+
+    % Randomly permute rows of A
+    p = randperm(s, m);
+    SA = A(p, :);
+
+    % Randomly change signs of the rows of A
+    sgn = (rand(s, m, 1) < .5) * 2 - 1;
+    SA = sgn .* SA;
     
     % WHT are only defined for even dimensions
     m = 2^(ceil(log2(m)));
-    
+
     % Applying an m-step WHT
-    Omega = (fwht(A, m));
+    SA = sqrt(m)*fwht(SA, m);
     
-    % Random subsampling of the transform output
+    % Random subsampling of the transformed output
     idx = sort(randsample(s, m, d));
-    Omega = Omega(idx, :)';
+    SA = SA(idx, :);
+
     % Multiplying by a constanat
-    Omega = Omega * (sqrt(m / d));
-    % Optional random row permutation
-    idx = randperm(s, n);
-    Omega = Omega(idx,:);
+    SA = SA * sqrt(m / d);
 end
