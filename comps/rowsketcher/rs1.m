@@ -42,12 +42,7 @@ function [Q] = rs1(A, k, p, s)
     end
 
     for i = 1 : p
-
         [Q, ~] = lu(A * Q);
-        if i == p
-            [Q, ~] = qr(A' * Q, 0);
-        else
-            [Q, ~] = lu(A' * Q);
-        end
+        [Q, ~] = lu(A' * Q);
     end
 end
